@@ -1,2 +1,4 @@
-# ola mundo
-# corno
+# Gastrovida
+===================
+# Bruno Henrique Barbosa Alves
+# Guilherme Henrique Fenner Hey
