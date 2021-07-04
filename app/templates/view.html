@@ -7,7 +7,7 @@
 </head>
 <body>
     <div class="col-8 m-auto pt-2 pb-2 text-center">
-        <h1>Cadastro</h1>
+        <h1>Visualização</h1>
     </div>
 
     {{nome}}
@@ -17,14 +17,9 @@
     </div>
 
     <div class="col-8 m-auto pt-4 pb-2 text-center">
-        <form name="form" id="form" action="/create/" method="post">
-            {% csrf_token %}
-            <!--{{form.as_p}}-->
-            <div class="form-group mt-4">Nome: {{form.nome}}</div>
-            <div class="form-group mt-4">Idade: {{form.idade}}</div>
-            <div class="form-group mt-4">Peso: {{form.peso}}</div>
-            <input type="submit" class="btn btn-success" value="Salvar">
-        </form>
+        <strong>Nome: </strong>{{db.nome}}<br>
+        <strong>Idade: </strong>{{db.idade}}<br>
+        <strong>Peso: </strong>{{db.peso}}<br>
     </div>
 
 </body>
