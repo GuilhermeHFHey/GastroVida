@@ -23,3 +23,17 @@ def view(request, pk):
     data = {}
     data['db'] = Pacientes.objects.get(pk=pk)
     return render(request, 'view.html', data)
+
+def edit(request, pk):
+    data = {}
+    data['db'] = Pacientes.objects.get(pk=pk)
+    data['form'] = PacientesForm(instance=data['db'])
+    return render(request, 'form.html', data)
+
+def update(request,pk):
+    data = {}
+    data['db'] = Pacientes.objects.get(pk=pk)
+    form = PacientesForm(request.POST or None, instance=data['db'])
+    if form.is_valid():
+        form.save()
+        return redirect('home')
