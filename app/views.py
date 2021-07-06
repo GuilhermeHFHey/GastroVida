@@ -1,13 +1,22 @@
 from django.shortcuts import render, redirect
 from app.forms import PacientesForm
 from app.models import Pacientes
+from django.core.paginator import Paginator
 
 # Create your views here.
 
 
 def home(request):
     data = {}
-    data['db'] = Pacientes.objects.all()
+    search = request.GET.get('search')
+    if search:
+        all = Pacientes.objects.filter(nome__icontains=search)
+    else:
+        all = Pacientes.objects.all()
+    # data['db'] = Pacientes.objects.all()
+    paginator = Paginator(all, 5)
+    pages = request.GET.get('page')
+    data['db'] = paginator.get_page(pages)
     return render(request, 'index.html', data)
 
 
