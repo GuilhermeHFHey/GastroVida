@@ -1,22 +1,27 @@
 from django.shortcuts import render, redirect
 from app.forms import PacientesForm
 from app.models import Pacientes
-from django.core.paginator import Paginator
-
+from django.template.loader import render_to_string
+from django.http import JsonResponse
 # Create your views here.
 
 
 def home(request):
     data = {}
-    search = request.GET.get('search')
+    search = request.GET.get("q")
     if search:
-        all = Pacientes.objects.filter(nome__icontains=search)
+        pacientes = Pacientes.objects.filter(nome__icontains=search)
     else:
-        all = Pacientes.objects.all()
-    # data['db'] = Pacientes.objects.all()
-    paginator = Paginator(all, 5)
-    pages = request.GET.get('page')
-    data['db'] = paginator.get_page(pages)
+        pacientes = Pacientes.objects.all()
+    data['db'] = pacientes
+    if request.is_ajax():
+        html = render_to_string(
+            template_name="index_partial.html",
+            context={'db': pacientes}
+        )
+        data_dict = {"html_from_view": html}
+        return JsonResponse(data=data_dict, safe=False)
+
     return render(request, 'index.html', data)
 
 
