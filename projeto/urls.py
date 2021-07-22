@@ -15,6 +15,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from django.contrib.auth import views as authViews
 from app.views import home, form, create, view, edit, update, delete
 
 urlpatterns = [
@@ -26,4 +27,7 @@ urlpatterns = [
     path('edit/<int:pk>/', edit, name='edit'),
     path('update/<int:pk>/', update, name='update'),
     path('delete/<int:pk>/', delete, name='delete'),
+    path('login/', authViews.LoginView.as_view(
+        template_name="../app/templates/login.html"
+    ), name='login'),
 ]
