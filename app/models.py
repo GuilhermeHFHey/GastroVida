@@ -3,6 +3,13 @@ from django.db import models
 # Create your models here.
 
 
+class Profissional(models.Model):
+    nome = models.CharField(max_length=150)
+    login = models.IntegerField()
+    senha = models.IntegerField()
+    prof = models.CharField(max_length=150)
+
+
 class Pacientes(models.Model):
     nome = models.CharField(max_length=150, blank=True)
     idade = models.IntegerField(blank=True)
