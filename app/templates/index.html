@@ -1,12 +1,14 @@
 {% extends 'modelo.html' %}
 
-<!DOCTYPE>
+<!DOCTYPE html>
 <html lang="pt-br">
 <head>
+    {% block head%}
     <meta charset="UTF-8">
     <title>CRUD Gastro</title>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    {% endblock %}
 </head>
 <body>
     {% block corpo %}
@@ -31,17 +33,19 @@
         {% include 'index_partial.html' %}
     </div>
 
-    <div class="pagination col-8 m-auto pt-2 pb-2 text-center">
+    <ul class="pagination justify-content-center">
         {% if db.has_previous %}
             <a href="?page={{db.previous_page_number}}" class="page-link"><</a>
         {% endif %}
 
-        {{db.number}}
+        <li class="page-item disabled">
+            <a class="page-link" href="#" tabindex="-1">{{db.number}}</a>
+        </li>
 
         {% if db.has_next %}
             <a href="?page={{db.next_page_number}}" class="page-link">></a>
         {% endif %}
-    </div>
+    </ul>
     {% endblock %}
 
     {%load static%}

@@ -1,10 +1,9 @@
 <table class="table table-bordered table-hover">
         <thead class="btn-dark">
             <tr class="table-success">
-                <th scope="col">#</th>
                 <th scope="col">Nome</th>
                 <th scope="col">Idade</th>
-                <th scope="col">Peso</th>
+                <th scope="col">Sexo</th>
                 <th scope="col">Ações</th>
             </tr>
         </thead>
@@ -12,10 +11,9 @@
         {% if db %}
         {% for dbs in db %}
             <tr>
-                <th> {{dbs.id}} </th>
                 <td> {{dbs.nome}} </td>
                 <td> {{dbs.idade}} </td>
-                <td> {{dbs.peso}} </td>
+                <td> {{dbs.sexo}} </td>
                 <td>
                     <a href="/view/{{dbs.id}}/" class="btn btn-dark">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">

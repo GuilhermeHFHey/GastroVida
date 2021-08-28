@@ -7,5 +7,7 @@ from app.models import Pacientes
 class PacientesForm(ModelForm):
     class Meta:
         model = Pacientes
-        fields = ['nome', 'idade', 'peso',
-                  'altura', 'pesoPreOperatorio', 'fumo']
+        fields = ['nome', 'idade', 'sexo', 'imc', 'altura',
+                  'ca', 'rcq', 'gc', 'cx', 'data', 'alta',
+                  'tpo', 'mes1', 'mes3', 'mes6', 'mes9', 'ano1',
+                  'ano2', 'ano3', 'ano4', 'ano5']
