@@ -16,7 +16,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from django.contrib.auth import views as authViews
-from app.views import home, form, create, view, edit, update, delete, uploadExel
+from app.views import home, form, create, view, edit, update, delete, uploadExel, Prediçao
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -31,4 +31,5 @@ urlpatterns = [
         template_name="../app/templates/login.html"
     ), name='login'),
     path('upload/', uploadExel, name='uploadExel'),
+    path('previsoes/<int:pk>/', Prediçao, name='previsoes'),
 ]
