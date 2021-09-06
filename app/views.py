@@ -9,6 +9,7 @@ from tablib import Dataset
 from django.core.paginator import Paginator
 import pandas as pd
 from sklearn.linear_model import LinearRegression
+from sklearn.ensemble import RandomForestRegressor
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import LeaveOneOut, cross_val_score
 # Create your views here.
@@ -286,7 +287,10 @@ def Regressor():
 
 rf, acc = Classificador()
 lr, r2 = Regressor()
-print(r2)
+acc = round(acc, 2)
+r2 = r2*10
+r2 = round(r2, 2)
+acc, r2 = acc*100, r2*100
 
 
 def Prediçao(request, pk):
@@ -297,7 +301,7 @@ def Prediçao(request, pk):
     prob = rf.predict_proba(paciente)
     data = {}
     data['db'] = {}
-    data['db'] = ({'prob': prob[0][1], 'acc': acc, 'id': pk})
+    data['db'] = ({'prob': round(prob[0][1], 2)*100, 'acc': acc, 'id': pk})
     return render(request, 'prediçao.html', data)
 
 
@@ -308,5 +312,5 @@ def Previsao(request, pk):
     pdp4 = lr.predict(paciente)
     data = {}
     data['db'] = {}
-    data['db'] = ({'pdp4': pdp4[0], 'r2': r2, 'id': pk})
+    data['db'] = ({'pdp4': round(pdp4[0], 2)*100, 'r2': r2, 'id': pk})
     return render(request, 'previsao.html', data)
