@@ -117,7 +117,6 @@ def uploadExel(request):
 
 def dataFrame():
     df = pd.DataFrame(list(Pacientes.objects.all().values()))
-    df.drop(index=df.index[0], axis=0, inplace=True)
     df["mes1"].fillna(-1, inplace=True)
     df["mes3"].fillna(-1, inplace=True)
     df["mes6"].fillna(-1, inplace=True)
@@ -129,7 +128,15 @@ def dataFrame():
     df["ano5"].fillna(-1, inplace=True)
     Abandonos = []
     ProximasConsultas = []
+    pdps1 = []
+    pdps2 = []
+    pdps3 = []
+    pdps4 = []
     for index, row in df.iterrows():
+        pdp1 = 0.28
+        pdp2 = 0.55
+        pdp3 = 0.75
+        pdp4 = 0.92
         abandono = False
         proximaConsulta = ""
         consultaAtual = row["tpo"]/365
@@ -137,58 +144,119 @@ def dataFrame():
             proximaConsulta = "mes1"
         elif 0.07 < consultaAtual <= 0.25:
             proximaConsulta = "mes3"
+            if row["mes1"] != -1:
+                pdp1 = row["mes1"]
+                pdp2 = row["mes1"]
+                pdp3 = row["mes1"]
+                pdp4 = row["mes1"]
         elif 0.25 < consultaAtual <= 0.5:
             proximaConsulta = "mes6"
             if row["mes3"] == -1 and row["mes1"] == -1:
                 abandono = True
+            if row["mes3"] != -1:
+                pdp4 = row["mes3"]
+            if row["mes1"] != -1:
+                pdp3 = row["mes1"]
         elif 0.5 < consultaAtual <= 0.75:
             proximaConsulta = "mes9"
             if row["mes6"] == -1 and row["mes3"] == -1:
                 abandono = True
+            if row["mes6"] != -1:
+                pdp4 = row["mes6"]
+            if row["mes3"] != -1:
+                pdp3 = row["mes3"]
+            if row["mes1"] != -1:
+                pdp2 = row["mes1"]
         elif 0.75 < consultaAtual <= 1:
             proximaConsulta = "ano1"
             if row["mes9"] == -1 and row["mes6"] == -1:
                 abandono = True
+            if row["mes9"] != -1:
+                pdp4 = row["mes9"]
+            if row["mes6"] != -1:
+                pdp3 = row["mes6"]
+            if row["mes3"] != -1:
+                pdp2 = row["mes3"]
+            if row["mes1"] != -1:
+                pdp1 = row["mes1"]
         elif 1 < consultaAtual <= 2:
             proximaConsulta = "ano2"
             if row["ano1"] == -1 and row["mes9"] == -1:
                 abandono = True
+            if row["ano1"] != -1:
+                pdp4 = row["ano1"]
+            if row["mes9"] != -1:
+                pdp3 = row["mes9"]
+            if row["mes6"] != -1:
+                pdp2 = row["mes6"]
+            if row["mes3"] != -1:
+                pdp1 = row["mes3"]
         elif 2 < consultaAtual <= 3:
             proximaConsulta = "ano3"
             if row["ano1"] == -1 and row["ano2"] == -1:
                 abandono = True
+            if row["ano2"] != -1:
+                pdp4 = row["ano2"]
+            if row["ano1"] != -1:
+                pdp3 = row["ano1"]
+            if row["mes9"] != -1:
+                pdp2 = row["mes9"]
+            if row["mes6"] != -1:
+                pdp1 = row["mes6"]
         elif 3 < consultaAtual <= 4:
             proximaConsulta = "ano4"
             if row["ano3"] == -1 and row["ano2"] == -1:
                 abandono = True
+            if row["ano3"] != -1:
+                pdp4 = row["ano3"]
+            if row["ano2"] != -1:
+                pdp3 = row["ano2"]
+            if row["ano1"] != -1:
+                pdp2 = row["ano1"]
+            if row["mes9"] != -1:
+                pdp1 = row["mes9"]
         elif 4 < consultaAtual <= 5:
             proximaConsulta = "ano5"
             if row["ano4"] == -1 and row["ano3"] == -1:
                 abandono = True
+            if row["ano4"] != -1:
+                pdp4 = row["ano4"]
+            if row["ano3"] != -1:
+                pdp3 = row["ano3"]
+            if row["ano2"] != -1:
+                pdp2 = row["ano2"]
+            if row["ano1"] != -1:
+                pdp1 = row["ano1"]
         else:
             if row["ano5"] == -1 and row["ano4"] == -1:
                 abandono = True
-
+            if row["ano5"] != -1:
+                pdp4 = row["ano5"]
+            if row["ano4"] != -1:
+                pdp3 = row["ano4"]
+            if row["ano3"] != -1:
+                pdp2 = row["ano3"]
+            if row["ano2"] != -1:
+                pdp1 = row["ano2"]
+        pdps1.append(pdp1)
+        pdps2.append(pdp2)
+        pdps3.append(pdp3)
+        pdps4.append(pdp4)
         Abandonos.append(abandono)
         ProximasConsultas.append(proximaConsulta)
 
     df["Abandono"] = Abandonos
     df["ProximaConsulta"] = ProximasConsultas
+    df["PDP1"] = pdps1
+    df["PDP2"] = pdps2
+    df["PDP3"] = pdps3
+    df["PDP4"] = pdps4
 
     return df
 
 
-# def Previsão(pk):
-#     global df
-#     paciente = df.loc[df["id"] == pk]
-#     X = df[["mes1", "mes3", "mes6", "mes9", "ano1", "ano2", "ano3", "ano4"]]
-#     y = df["ano5"]
-#     lr = LinearRegression()
-#     X_train, X_test, y_train, y_test = train_test_split(
-#         X, y, test_size=0.3, random_state=42)
-#     lr.fit(X_train, y_train)
-#     respostas = lr.predict(X_test)
-#     r2 = lr.score(respostas, y_test)
+df = dataFrame()
+
 
 def Classificador():
     global df
@@ -203,8 +271,22 @@ def Classificador():
     return rf, acc
 
 
-df = dataFrame()
+def Regressor():
+    global df
+    X = df[["PDP1", "PDP2", "PDP3"]]
+    y = df["PDP4"]
+    lr = LinearRegression()
+    lr.fit(X, y)
+    cv = LeaveOneOut()
+    scores = cross_val_score(
+        lr, X, y, scoring='neg_mean_absolute_error', cv=cv, n_jobs=1)
+    r2 = np.mean(np.absolute(scores))
+    return lr, r2
+
+
 rf, acc = Classificador()
+lr, r2 = Regressor()
+print(r2)
 
 
 def Prediçao(request, pk):
@@ -216,4 +298,15 @@ def Prediçao(request, pk):
     data = {}
     data['db'] = {}
     data['db'] = ({'prob': prob[0][1], 'acc': acc, 'id': pk})
-    return render(request, 'previsoes.html', data)
+    return render(request, 'prediçao.html', data)
+
+
+def Previsao(request, pk):
+    global df, lr, r2
+    paciente = df.loc[df["id"] == pk]
+    paciente = paciente[["PDP1", "PDP2", "PDP3"]]
+    pdp4 = lr.predict(paciente)
+    data = {}
+    data['db'] = {}
+    data['db'] = ({'pdp4': pdp4[0], 'r2': r2, 'id': pk})
+    return render(request, 'previsao.html', data)
