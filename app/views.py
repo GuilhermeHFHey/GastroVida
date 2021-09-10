@@ -265,7 +265,7 @@ def Classificador():
             "ano1", "ano2", "ano3", "ano4", "ano5"]]
     y = df["Abandono"]
     rf = RandomForestClassifier()
-    rf.fit(X, y)
+    rf = rf.fit(X, y)
     cv = LeaveOneOut()
     scores = cross_val_score(rf, X, y, cv=cv, n_jobs=1)
     acc = np.mean(np.absolute(scores))
@@ -277,7 +277,7 @@ def Regressor():
     X = df[["PDP1", "PDP2", "PDP3"]]
     y = df["PDP4"]
     lr = LinearRegression()
-    lr.fit(X, y)
+    lr = lr.fit(X, y)
     cv = LeaveOneOut()
     scores = cross_val_score(
         lr, X, y, scoring='neg_mean_absolute_error', cv=cv, n_jobs=1)
@@ -294,7 +294,17 @@ acc, r2 = acc*100, r2*100
 
 
 def Prediçao(request, pk):
-    global df, rf, acc
+    global rf, acc
+    df = pd.DataFrame(list(Pacientes.objects.all().values()))
+    df["mes1"].fillna(-1, inplace=True)
+    df["mes3"].fillna(-1, inplace=True)
+    df["mes6"].fillna(-1, inplace=True)
+    df["mes9"].fillna(-1, inplace=True)
+    df["ano1"].fillna(-1, inplace=True)
+    df["ano2"].fillna(-1, inplace=True)
+    df["ano3"].fillna(-1, inplace=True)
+    df["ano4"].fillna(-1, inplace=True)
+    df["ano5"].fillna(-1, inplace=True)
     paciente = df.loc[df["id"] == pk]
     paciente = paciente[["tpo", "mes1", "mes3", "mes6", "mes9",
                          "ano1", "ano2", "ano3", "ano4", "ano5"]]
@@ -307,6 +317,16 @@ def Prediçao(request, pk):
 
 def Previsao(request, pk):
     global df, lr, r2
+    # df = pd.DataFrame(list(Pacientes.objects.all().values()))
+    # df["mes1"].fillna(-1, inplace=True)
+    # df["mes3"].fillna(-1, inplace=True)
+    # df["mes6"].fillna(-1, inplace=True)
+    # df["mes9"].fillna(-1, inplace=True)
+    # df["ano1"].fillna(-1, inplace=True)
+    # df["ano2"].fillna(-1, inplace=True)
+    # df["ano3"].fillna(-1, inplace=True)
+    # df["ano4"].fillna(-1, inplace=True)
+    # df["ano5"].fillna(-1, inplace=True)
     paciente = df.loc[df["id"] == pk]
     paciente = paciente[["PDP1", "PDP2", "PDP3"]]
     pdp4 = lr.predict(paciente)
