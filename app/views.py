@@ -9,9 +9,12 @@ from tablib import Dataset
 from django.core.paginator import Paginator
 import pandas as pd
 from sklearn.linear_model import LinearRegression
-from sklearn.ensemble import RandomForestRegressor
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import LeaveOneOut, cross_val_score
+from sklearn.metrics import roc_curve, accuracy_score, f1_score, precision_score, roc_auc_score
+from imblearn.under_sampling import RandomUnderSampler
+import matplotlib.pyplot as plt
+from sklearn.model_selection import train_test_split
 # Create your views here.
 
 
@@ -264,12 +267,44 @@ def Classificador():
     X = df[["tpo", "mes1", "mes3", "mes6", "mes9",
             "ano1", "ano2", "ano3", "ano4", "ano5"]]
     y = df["Abandono"]
-    rf = RandomForestClassifier()
-    rf = rf.fit(X, y)
+    rus = RandomUnderSampler()
+    y_true, y_pred, probs = [], [], []
+
     cv = LeaveOneOut()
-    scores = cross_val_score(rf, X, y, cv=cv, n_jobs=1)
-    acc = np.mean(np.absolute(scores))
-    return rf, acc
+    for train_index, test_index in cv.split(X):
+        X_train, X_test = X.iloc[train_index], X.iloc[test_index]
+        y_train, y_test = y[train_index], y[test_index]
+        X_train, y_train = rus.fit_resample(X_train, y_train)
+        rf = RandomForestClassifier()
+        X_train, y_train = rus.fit_resample(X_train, y_train)
+        rf.fit(X_train, y_train)
+        y_true.append(y_test)
+        y_pred.append(rf.predict(X_test)[0])
+        probs.append(rf.predict_proba(X_test)[:, 1])
+
+    acc = accuracy_score(y_true, y_pred)
+    pre = precision_score(y_true, y_pred)
+    f1 = f1_score(y_true, y_pred)
+    auc = roc_auc_score(y_true, probs)
+
+    prob = rf.predict_proba(X)
+    prob = prob[:, 1]
+    fper, tper, thresholds = roc_curve(y, prob)
+    plot_roc_curve(fper, tper)
+
+    rf = RandomForestClassifier()
+    rf.fit(X, y)
+    return rf, acc, pre, f1, auc
+
+
+def plot_roc_curve(fper, tper):
+    plt.plot(fper, tper, color='red', label='ROC')
+    plt.plot([0, 1], [0, 1], color='green', linestyle='--')
+    plt.xlabel('False Positive Rate')
+    plt.ylabel('True Positive Rate')
+    plt.title('Receiver Operating Characteristic Curve')
+    plt.legend()
+    plt.show()
 
 
 def Regressor():
@@ -285,16 +320,16 @@ def Regressor():
     return lr, r2
 
 
-rf, acc = Classificador()
+rf, acc, pre, f1, auc = Classificador()
 lr, r2 = Regressor()
 acc = round(acc, 2)
 r2 = r2*10
 r2 = round(r2, 2)
-acc, r2 = acc*100, r2*100
+acc, pre, f1, auc, r2 = acc*100, pre*100, f1*100, auc*100, r2*100
 
 
 def Prediçao(request, pk):
-    global rf, acc
+    global rf, acc, pre, f1, auc
     df = pd.DataFrame(list(Pacientes.objects.all().values()))
     df["mes1"].fillna(-1, inplace=True)
     df["mes3"].fillna(-1, inplace=True)
@@ -311,23 +346,112 @@ def Prediçao(request, pk):
     prob = rf.predict_proba(paciente)
     data = {}
     data['db'] = {}
-    data['db'] = ({'prob': round(prob[0][1], 2)*100, 'acc': acc, 'id': pk})
+    data['db'] = ({'prob': round(prob[0][1], 2)*100, 'acc': acc,
+                  'pre': pre, 'f1': f1, 'auc': auc, 'id': pk})
     return render(request, 'prediçao.html', data)
 
 
 def Previsao(request, pk):
     global df, lr, r2
-    # df = pd.DataFrame(list(Pacientes.objects.all().values()))
-    # df["mes1"].fillna(-1, inplace=True)
-    # df["mes3"].fillna(-1, inplace=True)
-    # df["mes6"].fillna(-1, inplace=True)
-    # df["mes9"].fillna(-1, inplace=True)
-    # df["ano1"].fillna(-1, inplace=True)
-    # df["ano2"].fillna(-1, inplace=True)
-    # df["ano3"].fillna(-1, inplace=True)
-    # df["ano4"].fillna(-1, inplace=True)
-    # df["ano5"].fillna(-1, inplace=True)
+    df = pd.DataFrame(list(Pacientes.objects.all().values()))
     paciente = df.loc[df["id"] == pk]
+    paciente["mes1"].fillna(-1, inplace=True)
+    paciente["mes3"].fillna(-1, inplace=True)
+    paciente["mes6"].fillna(-1, inplace=True)
+    paciente["mes9"].fillna(-1, inplace=True)
+    paciente["ano1"].fillna(-1, inplace=True)
+    paciente["ano2"].fillna(-1, inplace=True)
+    paciente["ano3"].fillna(-1, inplace=True)
+    paciente["ano4"].fillna(-1, inplace=True)
+    paciente["ano5"].fillna(-1, inplace=True)
+    pdp1 = 0.28
+    pdp2 = 0.55
+    pdp3 = 0.75
+    pdp4 = 0.92
+    consultaAtual = (paciente["tpo"].values)/365
+    if consultaAtual <= 0.07:
+        proximaConsulta = "mes1"
+    elif 0.07 < consultaAtual <= 0.25:
+        proximaConsulta = "mes3"
+        if paciente["mes1"].values != -1:
+            pdp1 = paciente["mes1"].values
+    elif 0.25 < consultaAtual <= 0.5:
+        proximaConsulta = "mes6"
+        if paciente["mes3"].values != -1:
+            pdp4 = paciente["mes3"].values
+        if paciente["mes1"].values != -1:
+            pdp3 = paciente["mes1"].values
+    elif 0.5 < consultaAtual <= 0.75:
+        proximaConsulta = "mes9"
+        if paciente["mes6"].values != -1:
+            pdp4 = paciente["mes6"].values
+        if paciente["mes3"].values != -1:
+            pdp3 = paciente["mes3"].values
+        if paciente["mes1"].values != -1:
+            pdp2 = paciente["mes1"].values
+    elif 0.75 < consultaAtual <= 1:
+        proximaConsulta = "ano1"
+        if paciente["mes9"].values != -1:
+            pdp4 = paciente["mes9"].values
+        if paciente["mes6"].values != -1:
+            pdp3 = paciente["mes6"].values
+        if paciente["mes3"].values != -1:
+            pdp2 = paciente["mes3"].values
+        if paciente["mes1"].values != -1:
+            pdp1 = paciente["mes1"].values
+    elif 1 < consultaAtual <= 2:
+        proximaConsulta = "ano2"
+        if paciente["ano1"].values != -1:
+            pdp4 = paciente["ano1"].values
+        if paciente["mes9"].values != -1:
+            pdp3 = paciente["mes9"].values
+        if paciente["mes6"].values != -1:
+            pdp2 = paciente["mes6"].values
+        if paciente["mes3"].values != -1:
+            pdp1 = paciente["mes3"].values
+    elif 2 < consultaAtual <= 3:
+        proximaConsulta = "ano3"
+        if paciente["ano2"].values != -1:
+            pdp4 = paciente["ano2"].values
+        if paciente["ano1"].values != -1:
+            pdp3 = paciente["ano1"].values
+        if paciente["mes9"].values != -1:
+            pdp2 = paciente["mes9"].values
+        if paciente["mes6"].values != -1:
+            pdp1 = paciente["mes6"].values
+    elif 3 < consultaAtual <= 4:
+        proximaConsulta = "ano4"
+        if paciente["ano3"].values != -1:
+            pdp4 = paciente["ano3"].values
+        if paciente["ano2"].values != -1:
+            pdp3 = paciente["ano2"].values
+        if paciente["ano1"].values != -1:
+            pdp2 = paciente["ano1"].values
+        if paciente["mes9"].values != -1:
+            pdp1 = paciente["mes9"].values
+    elif 4 < consultaAtual <= 5:
+        proximaConsulta = "ano5"
+        if paciente["ano4"].values != -1:
+            pdp4 = paciente["ano4"].values
+        if paciente["ano3"].values != -1:
+            pdp3 = paciente["ano3"].values
+        if paciente["ano2"].values != -1:
+            pdp2 = paciente["ano2"].values
+        if paciente["ano1"].values != -1:
+            pdp1 = paciente["ano1"].values
+    else:
+        if paciente["ano5"].values != -1:
+            pdp4 = paciente["ano5"].values
+        if paciente["ano4"].values != -1:
+            pdp3 = paciente["ano4"].values
+        if paciente["ano3"].values != -1:
+            pdp2 = paciente["ano3"].values
+        if paciente["ano2"].values != -1:
+            pdp1 = paciente["ano2"].values
+    paciente["PDP1"] = pdp1
+    paciente["PDP2"] = pdp2
+    paciente["PDP3"] = pdp3
+    paciente["PDP4"] = pdp4
     paciente = paciente[["PDP1", "PDP2", "PDP3"]]
     pdp4 = lr.predict(paciente)
     data = {}
