@@ -1,5 +1,4 @@
 from django.shortcuts import render, redirect
-import numpy as np
 from app.forms import PacientesForm
 from app.models import Pacientes
 from django.template.loader import render_to_string
@@ -10,11 +9,10 @@ from django.core.paginator import Paginator
 import pandas as pd
 from sklearn.linear_model import LinearRegression
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.model_selection import LeaveOneOut, cross_val_score
-from sklearn.metrics import roc_curve, accuracy_score, f1_score, precision_score, roc_auc_score
+from sklearn.model_selection import LeaveOneOut
+from sklearn.metrics import roc_curve, accuracy_score, f1_score, precision_score, roc_auc_score, mean_absolute_error, mean_squared_error, r2_score
 from imblearn.under_sampling import RandomUnderSampler
 import matplotlib.pyplot as plt
-from sklearn.model_selection import train_test_split
 # Create your views here.
 
 
@@ -137,10 +135,19 @@ def dataFrame():
     pdps3 = []
     pdps4 = []
     for index, row in df.iterrows():
-        pdp1 = 0.28
-        pdp2 = 0.55
-        pdp3 = 0.75
-        pdp4 = 0.92
+        pdp1 = 0.25
+        pdp2 = 0.45
+        pdp3 = 0.64
+        pdp4 = 0.75
+        if row["mes1"] != -1:
+            pdp1 = row["mes1"]
+        if row["mes3"] != -1:
+            pdp2 = row["mes3"]
+        if row["mes6"] != -1:
+            pdp3 = row["mes6"]
+        if row["mes9"] != -1:
+            pdp4 = row["mes9"]
+
         abandono = False
         proximaConsulta = ""
         consultaAtual = row["tpo"]/365
@@ -148,100 +155,37 @@ def dataFrame():
             proximaConsulta = "mes1"
         elif 0.07 < consultaAtual <= 0.25:
             proximaConsulta = "mes3"
-            if row["mes1"] != -1:
-                pdp1 = row["mes1"]
-                pdp2 = row["mes1"]
-                pdp3 = row["mes1"]
-                pdp4 = row["mes1"]
         elif 0.25 < consultaAtual <= 0.5:
             proximaConsulta = "mes6"
             if row["mes3"] == -1 and row["mes1"] == -1:
                 abandono = True
-            if row["mes3"] != -1:
-                pdp4 = row["mes3"]
-            if row["mes1"] != -1:
-                pdp3 = row["mes1"]
         elif 0.5 < consultaAtual <= 0.75:
             proximaConsulta = "mes9"
             if row["mes6"] == -1 and row["mes3"] == -1:
                 abandono = True
-            if row["mes6"] != -1:
-                pdp4 = row["mes6"]
-            if row["mes3"] != -1:
-                pdp3 = row["mes3"]
-            if row["mes1"] != -1:
-                pdp2 = row["mes1"]
         elif 0.75 < consultaAtual <= 1:
             proximaConsulta = "ano1"
             if row["mes9"] == -1 and row["mes6"] == -1:
                 abandono = True
-            if row["mes9"] != -1:
-                pdp4 = row["mes9"]
-            if row["mes6"] != -1:
-                pdp3 = row["mes6"]
-            if row["mes3"] != -1:
-                pdp2 = row["mes3"]
-            if row["mes1"] != -1:
-                pdp1 = row["mes1"]
         elif 1 < consultaAtual <= 2:
             proximaConsulta = "ano2"
             if row["ano1"] == -1 and row["mes9"] == -1:
                 abandono = True
-            if row["ano1"] != -1:
-                pdp4 = row["ano1"]
-            if row["mes9"] != -1:
-                pdp3 = row["mes9"]
-            if row["mes6"] != -1:
-                pdp2 = row["mes6"]
-            if row["mes3"] != -1:
-                pdp1 = row["mes3"]
         elif 2 < consultaAtual <= 3:
             proximaConsulta = "ano3"
             if row["ano1"] == -1 and row["ano2"] == -1:
                 abandono = True
-            if row["ano2"] != -1:
-                pdp4 = row["ano2"]
-            if row["ano1"] != -1:
-                pdp3 = row["ano1"]
-            if row["mes9"] != -1:
-                pdp2 = row["mes9"]
-            if row["mes6"] != -1:
-                pdp1 = row["mes6"]
         elif 3 < consultaAtual <= 4:
             proximaConsulta = "ano4"
             if row["ano3"] == -1 and row["ano2"] == -1:
                 abandono = True
-            if row["ano3"] != -1:
-                pdp4 = row["ano3"]
-            if row["ano2"] != -1:
-                pdp3 = row["ano2"]
-            if row["ano1"] != -1:
-                pdp2 = row["ano1"]
-            if row["mes9"] != -1:
-                pdp1 = row["mes9"]
         elif 4 < consultaAtual <= 5:
             proximaConsulta = "ano5"
             if row["ano4"] == -1 and row["ano3"] == -1:
                 abandono = True
-            if row["ano4"] != -1:
-                pdp4 = row["ano4"]
-            if row["ano3"] != -1:
-                pdp3 = row["ano3"]
-            if row["ano2"] != -1:
-                pdp2 = row["ano2"]
-            if row["ano1"] != -1:
-                pdp1 = row["ano1"]
         else:
             if row["ano5"] == -1 and row["ano4"] == -1:
                 abandono = True
-            if row["ano5"] != -1:
-                pdp4 = row["ano5"]
-            if row["ano4"] != -1:
-                pdp3 = row["ano4"]
-            if row["ano3"] != -1:
-                pdp2 = row["ano3"]
-            if row["ano2"] != -1:
-                pdp1 = row["ano2"]
         pdps1.append(pdp1)
         pdps2.append(pdp2)
         pdps3.append(pdp3)
@@ -276,7 +220,6 @@ def Classificador():
         y_train, y_test = y[train_index], y[test_index]
         X_train, y_train = rus.fit_resample(X_train, y_train)
         rf = RandomForestClassifier()
-        X_train, y_train = rus.fit_resample(X_train, y_train)
         rf.fit(X_train, y_train)
         y_true.append(y_test)
         y_pred.append(rf.predict(X_test)[0])
@@ -287,17 +230,17 @@ def Classificador():
     f1 = f1_score(y_true, y_pred)
     auc = roc_auc_score(y_true, probs)
 
-    prob = rf.predict_proba(X)
-    prob = prob[:, 1]
-    fper, tper, thresholds = roc_curve(y, prob)
-    plot_roc_curve(fper, tper)
+    # prob = rf.predict_proba(X)
+    # prob = prob[:, 1]
+    # fper, tper, thresholds = roc_curve(y, prob)
+    # plot_roc_curve(fper, tper)
 
     rf = RandomForestClassifier()
     rf.fit(X, y)
     return rf, acc, pre, f1, auc
 
 
-def plot_roc_curve(fper, tper):
+# def plot_roc_curve(fper, tper):
     plt.plot(fper, tper, color='red', label='ROC')
     plt.plot([0, 1], [0, 1], color='green', linestyle='--')
     plt.xlabel('False Positive Rate')
@@ -311,21 +254,36 @@ def Regressor():
     global df
     X = df[["PDP1", "PDP2", "PDP3"]]
     y = df["PDP4"]
-    lr = LinearRegression()
-    lr = lr.fit(X, y)
+    y_true, y_pred = [], []
+
     cv = LeaveOneOut()
-    scores = cross_val_score(
-        lr, X, y, scoring='neg_mean_absolute_error', cv=cv, n_jobs=1)
-    r2 = np.mean(np.absolute(scores))
-    return lr, r2
+    for train_index, test_index in cv.split(X):
+        X_train, X_test = X.iloc[train_index], X.iloc[test_index]
+        y_train, y_test = y[train_index], y[test_index]
+        lr = LinearRegression()
+        lr.fit(X_train, y_train)
+        y_true.append(y_test)
+        y_pred.append(lr.predict(X_test)[0])
+
+    r2 = r2_score(y_true, y_pred)
+    mae = mean_absolute_error(y_true, y_pred)
+    mse = mean_squared_error(y_true, y_pred)
+
+    lr = LinearRegression()
+    lr.fit(X, y)
+
+    return lr, r2, mae, mse
 
 
 rf, acc, pre, f1, auc = Classificador()
-lr, r2 = Regressor()
-acc = round(acc, 2)
-r2 = r2*10
-r2 = round(r2, 2)
-acc, pre, f1, auc, r2 = acc*100, pre*100, f1*100, auc*100, r2*100
+print("Classificador Pronto")
+lr, r2, mae, mse = Regressor()
+print("Regressor Pronto")
+acc = round(acc, 2)*100
+pre = round(acc, 2)*100
+f1 = round(acc, 2)*100
+auc = round(acc, 2)*100
+r2 = round(r2, 2)*100
 
 
 def Prediçao(request, pk):
@@ -352,109 +310,32 @@ def Prediçao(request, pk):
 
 
 def Previsao(request, pk):
-    global df, lr, r2
+    global df, lr, r2, mae, mse
     df = pd.DataFrame(list(Pacientes.objects.all().values()))
     paciente = df.loc[df["id"] == pk]
-    paciente["mes1"].fillna(-1, inplace=True)
-    paciente["mes3"].fillna(-1, inplace=True)
-    paciente["mes6"].fillna(-1, inplace=True)
-    paciente["mes9"].fillna(-1, inplace=True)
-    paciente["ano1"].fillna(-1, inplace=True)
-    paciente["ano2"].fillna(-1, inplace=True)
-    paciente["ano3"].fillna(-1, inplace=True)
-    paciente["ano4"].fillna(-1, inplace=True)
-    paciente["ano5"].fillna(-1, inplace=True)
-    pdp1 = 0.28
-    pdp2 = 0.55
-    pdp3 = 0.75
-    pdp4 = 0.92
-    consultaAtual = (paciente["tpo"].values)/365
-    if consultaAtual <= 0.07:
-        proximaConsulta = "mes1"
-    elif 0.07 < consultaAtual <= 0.25:
-        proximaConsulta = "mes3"
-        if paciente["mes1"].values != -1:
-            pdp1 = paciente["mes1"].values
-    elif 0.25 < consultaAtual <= 0.5:
-        proximaConsulta = "mes6"
-        if paciente["mes3"].values != -1:
-            pdp4 = paciente["mes3"].values
-        if paciente["mes1"].values != -1:
-            pdp3 = paciente["mes1"].values
-    elif 0.5 < consultaAtual <= 0.75:
-        proximaConsulta = "mes9"
-        if paciente["mes6"].values != -1:
-            pdp4 = paciente["mes6"].values
-        if paciente["mes3"].values != -1:
-            pdp3 = paciente["mes3"].values
-        if paciente["mes1"].values != -1:
-            pdp2 = paciente["mes1"].values
-    elif 0.75 < consultaAtual <= 1:
-        proximaConsulta = "ano1"
-        if paciente["mes9"].values != -1:
-            pdp4 = paciente["mes9"].values
-        if paciente["mes6"].values != -1:
-            pdp3 = paciente["mes6"].values
-        if paciente["mes3"].values != -1:
-            pdp2 = paciente["mes3"].values
-        if paciente["mes1"].values != -1:
-            pdp1 = paciente["mes1"].values
-    elif 1 < consultaAtual <= 2:
-        proximaConsulta = "ano2"
-        if paciente["ano1"].values != -1:
-            pdp4 = paciente["ano1"].values
-        if paciente["mes9"].values != -1:
-            pdp3 = paciente["mes9"].values
-        if paciente["mes6"].values != -1:
-            pdp2 = paciente["mes6"].values
-        if paciente["mes3"].values != -1:
-            pdp1 = paciente["mes3"].values
-    elif 2 < consultaAtual <= 3:
-        proximaConsulta = "ano3"
-        if paciente["ano2"].values != -1:
-            pdp4 = paciente["ano2"].values
-        if paciente["ano1"].values != -1:
-            pdp3 = paciente["ano1"].values
-        if paciente["mes9"].values != -1:
-            pdp2 = paciente["mes9"].values
-        if paciente["mes6"].values != -1:
-            pdp1 = paciente["mes6"].values
-    elif 3 < consultaAtual <= 4:
-        proximaConsulta = "ano4"
-        if paciente["ano3"].values != -1:
-            pdp4 = paciente["ano3"].values
-        if paciente["ano2"].values != -1:
-            pdp3 = paciente["ano2"].values
-        if paciente["ano1"].values != -1:
-            pdp2 = paciente["ano1"].values
-        if paciente["mes9"].values != -1:
-            pdp1 = paciente["mes9"].values
-    elif 4 < consultaAtual <= 5:
-        proximaConsulta = "ano5"
-        if paciente["ano4"].values != -1:
-            pdp4 = paciente["ano4"].values
-        if paciente["ano3"].values != -1:
-            pdp3 = paciente["ano3"].values
-        if paciente["ano2"].values != -1:
-            pdp2 = paciente["ano2"].values
-        if paciente["ano1"].values != -1:
-            pdp1 = paciente["ano1"].values
-    else:
-        if paciente["ano5"].values != -1:
-            pdp4 = paciente["ano5"].values
-        if paciente["ano4"].values != -1:
-            pdp3 = paciente["ano4"].values
-        if paciente["ano3"].values != -1:
-            pdp2 = paciente["ano3"].values
-        if paciente["ano2"].values != -1:
-            pdp1 = paciente["ano2"].values
+    pdp1 = 0.25
+    pdp2 = 0.45
+    pdp3 = 0.64
+    try:
+        pdp1 = paciente["mes1"]
+    except Exception:
+        pass
+    try:
+        pdp2 = paciente["mes3"]
+    except Exception:
+        pass
+    try:
+        pdp3 = paciente["mes6"]
+    except Exception:
+        pass
     paciente["PDP1"] = pdp1
     paciente["PDP2"] = pdp2
     paciente["PDP3"] = pdp3
-    paciente["PDP4"] = pdp4
     paciente = paciente[["PDP1", "PDP2", "PDP3"]]
+    print(paciente)
     pdp4 = lr.predict(paciente)
     data = {}
     data['db'] = {}
-    data['db'] = ({'pdp4': round(pdp4[0], 2)*100, 'r2': r2, 'id': pk})
+    data['db'] = ({'pdp4': round(pdp4[0], 2)*100, 'r2': r2,
+                  'mae': mae, 'mse': mse, 'id': pk})
     return render(request, 'previsao.html', data)
