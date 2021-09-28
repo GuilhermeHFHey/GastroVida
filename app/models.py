@@ -33,6 +33,7 @@ class Pacientes(models.Model):
     ano3 = models.FloatField(max_length=4, blank=True, null=True)
     ano4 = models.FloatField(max_length=4, blank=True, null=True)
     ano5 = models.FloatField(max_length=4, blank=True, null=True)
+    proficional = models.ManyToManyField(Profissional)
 
     # peso = models.FloatField(max_length=30, blank=True)
     # pesoPreOperatorio = models.FloatField(
