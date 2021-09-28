@@ -118,10 +118,10 @@ def uploadExel(request):
             p = Profissional.objects.get(pk=1)
             value.save()
             value.proficional.add(p)
-            
+
     return render(request, 'import.html')
 
-"""
+
 def dataFrame():
     df = pd.DataFrame(list(Pacientes.objects.all().values()))
     df["mes1"].fillna(-1, inplace=True)
@@ -216,37 +216,37 @@ def ClassificadorLOO():
     X = df[["tpo", "mes1", "mes3", "mes6", "mes9",
             "ano1", "ano2", "ano3", "ano4", "ano5"]]
     y = df["Abandono"]
-    y_true, y_pred, probs = [], [], []
+    # y_true, y_pred, probs = [], [], []
 
-    cv = LeaveOneOut()
-    for train_index, test_index in cv.split(X):
-        X_train, X_test = X.iloc[train_index], X.iloc[test_index]
-        y_train, y_test = y[train_index], y[test_index]
-        rf = RandomForestClassifier()
-        rf.fit(X_train, y_train)
-        y_true.append(y_test)
-        y_pred.append(rf.predict(X_test)[0])
-        probs.append(rf.predict_proba(X_test)[:, 1])
+    # cv = LeaveOneOut()
+    # for train_index, test_index in cv.split(X):
+    #     X_train, X_test = X.iloc[train_index], X.iloc[test_index]
+    #     y_train, y_test = y[train_index], y[test_index]
+    #     rf = RandomForestClassifier()
+    #     rf.fit(X_train, y_train)
+    #     y_true.append(y_test)
+    #     y_pred.append(rf.predict(X_test)[0])
+    #     probs.append(rf.predict_proba(X_test)[:, 1])
 
-    y_pred = np.array(y_pred)
-    y_true = np.array(y_true)
-    probs = np.array(probs)
-    acc = accuracy_score(y_true, y_pred)
-    pre = precision_score(y_true, y_pred)
-    f1 = f1_score(y_true, y_pred)
-    auc = roc_auc_score(y_true, probs)
-    print("="*30)
-    print("Testes com base original")
-    print("Acuracia: ", acc)
-    print("Area ROC: ", auc)
-    tn, fp, fn, tp = confusion_matrix(y_true, y_pred).ravel()
-    print("Sencibilidade :", tp / (tp+fn))
-    print("Especificidade: ", tn / (tn+fp))
-    plot_matrix(confusion_matrix(y_true, y_pred))
-    print("="*30)
+    # y_pred = np.array(y_pred)
+    # y_true = np.array(y_true)
+    # probs = np.array(probs)
+    # acc = accuracy_score(y_true, y_pred)
+    # pre = precision_score(y_true, y_pred)
+    # f1 = f1_score(y_true, y_pred)
+    # auc = roc_auc_score(y_true, probs)
+    # print("="*30)
+    # print("Testes com base original")
+    # print("Acuracia: ", acc)
+    # print("Area ROC: ", auc)
+    # tn, fp, fn, tp = confusion_matrix(y_true, y_pred).ravel()
+    # print("Sencibilidade :", tp / (tp+fn))
+    # print("Especificidade: ", tn / (tn+fp))
+    # plot_matrix(confusion_matrix(y_true, y_pred))
+    # print("="*30)
 
-    fper, tper, thresholds = roc_curve(y, probs)
-    plot_roc_curve(fper, tper)
+    # fper, tper, thresholds = roc_curve(y, probs)
+    # plot_roc_curve(fper, tper)
 
     rus = RandomUnderSampler()
     X, y = rus.fit_resample(X, y)
@@ -266,24 +266,24 @@ def ClassificadorLOO():
     pre = precision_score(y_true, y_pred)
     f1 = f1_score(y_true, y_pred)
     auc = roc_auc_score(y_true, probs)
-    print("="*30)
-    print("Testes com base balanceada")
-    print("Acuracia: ", acc)
-    print("Area ROC: ", auc)
-    print("Sencibilidade :", recall_score(y_true, y_pred))
-    tn, fp, fn, tp = confusion_matrix(y_true, y_pred).ravel()
-    print("Especificidade: ", tn / (tn+fp))
-    plot_matrix(confusion_matrix(y_true, y_pred))
-    print("="*30)
+    # print("="*30)
+    # print("Testes com base balanceada")
+    # print("Acuracia: ", acc)
+    # print("Area ROC: ", auc)
+    # print("Sencibilidade :", recall_score(y_true, y_pred))
+    # tn, fp, fn, tp = confusion_matrix(y_true, y_pred).ravel()
+    # print("Especificidade: ", tn / (tn+fp))
+    # plot_matrix(confusion_matrix(y_true, y_pred))
+    # print("="*30)
 
-    fper, tper, thresholds = roc_curve(y, probs)
-    plot_roc_curve(fper, tper)
+    # fper, tper, thresholds = roc_curve(y, probs)
+    # plot_roc_curve(fper, tper)
 
     rf = RandomForestClassifier()
     rf.fit(X, y)
     return rf, acc, pre, f1, auc
 
-
+"""
 def ClassificadorKF():
     global df
     print("INICIO KF")
@@ -377,7 +377,7 @@ def plot_roc_curve(fper, tper):
     plt.title('Receiver Operating Characteristic Curve')
     plt.legend()
     plt.savefig("ROC.png")
-
+"""
 
 def Regressor():
     global df
@@ -397,32 +397,32 @@ def Regressor():
     mae = mean_absolute_error(y_true, y_pred)
     mse = mean_squared_error(y_true, y_pred, squared=True)
     rmse = mean_squared_error(y_true, y_pred, squared=False)
-    print("="*30)
-    print("LOO")
-    print(mae)
-    print(mse)
-    print(rmse)
-    print("="*30)
+    # print("="*30)
+    # print("LOO")
+    # print(mae)
+    # print(mse)
+    # print(rmse)
+    # print("="*30)
 
-    cv = KFold(n_splits=5)
-    for train_index, test_index in cv.split(X):
-        X_train, X_test = X.iloc[train_index], X.iloc[test_index]
-        y_train, y_test = y[train_index], y[test_index]
-        lr = LinearRegression()
-        lr.fit(X_train, y_train)
-        y_true = y_true + y_test.tolist()
-        y_pred = y_pred + lr.predict(X_test).tolist()
+    # cv = KFold(n_splits=5)
+    # for train_index, test_index in cv.split(X):
+    #     X_train, X_test = X.iloc[train_index], X.iloc[test_index]
+    #     y_train, y_test = y[train_index], y[test_index]
+    #     lr = LinearRegression()
+    #     lr.fit(X_train, y_train)
+    #     y_true = y_true + y_test.tolist()
+    #     y_pred = y_pred + lr.predict(X_test).tolist()
 
-    r2 = r2_score(y_true, y_pred)
-    mae = mean_absolute_error(y_true, y_pred)
-    mse = mean_squared_error(y_true, y_pred, squared=True)
-    rmse = mean_squared_error(y_true, y_pred, squared=False)
-    print("="*30)
-    print("KFOLD")
-    print(mae)
-    print(mse)
-    print(rmse)
-    print("="*30)
+    # r2 = r2_score(y_true, y_pred)
+    # mae = mean_absolute_error(y_true, y_pred)
+    # mse = mean_squared_error(y_true, y_pred, squared=True)
+    # rmse = mean_squared_error(y_true, y_pred, squared=False)
+    # print("="*30)
+    # print("KFOLD")
+    # print(mae)
+    # print(mse)
+    # print(rmse)
+    # print("="*30)
 
     lr = LinearRegression()
     lr.fit(X, y)
@@ -431,65 +431,123 @@ def Regressor():
 
 
 rf, acc, pre, f1, auc = ClassificadorLOO()
-ClassificadorKF()
+# ClassificadorKF()
 print("Classificador Pronto")
 lr, mae, mse, rmse = Regressor()
 print("Regressor Pronto")
-acc = round(acc, 2)*100
-pre = round(acc, 2)*100
-f1 = round(acc, 2)*100
-auc = round(acc, 2)*100
+# acc = round(acc, 2)*100
+# pre = round(acc, 2)*100
+# f1 = round(acc, 2)*100
+# auc = round(acc, 2)*100
+
+
+def PrevPred(request, pk):
+    global rf, lr
+    df = pd.DataFrame(list(Pacientes.objects.all().values()))
+    df["mes1"].fillna(-1, inplace=True)
+    df["mes3"].fillna(-1, inplace=True)
+    df["mes6"].fillna(-1, inplace=True)
+    df["mes9"].fillna(-1, inplace=True)
+    df["ano1"].fillna(-1, inplace=True)
+    df["ano2"].fillna(-1, inplace=True)
+    df["ano3"].fillna(-1, inplace=True)
+    df["ano4"].fillna(-1, inplace=True)
+    df["ano5"].fillna(-1, inplace=True)
+    paciente = df.loc[df["id"] == pk]
+    paciente = paciente[["tpo", "mes1", "mes3", "mes6", "mes9",
+                         "ano1", "ano2", "ano3", "ano4", "ano5"]]
+    prob = rf.predict_proba(paciente)
+    pdp1 = 0.25
+    pdp2 = 0.45
+    pdp3 = 0.64
+    try:
+        pdp1 = paciente["mes1"].values[0]
+    except Exception:
+        pass
+    try:
+        pdp2 = paciente["mes3"].values[0]
+    except Exception:
+        pass
+    try:
+        pdp3 = paciente["mes6"].values[0]
+    except Exception:
+        pass
+    paciente["PDP1"] = pdp1
+    paciente["PDP2"] = pdp2
+    paciente["PDP3"] = pdp3
+    paciente = paciente[["PDP1", "PDP2", "PDP3"]]
+    pdp4 = lr.predict(paciente)[0]
+    lines = pd.DataFrame({
+        'Média':[0.25, 0.45, 0.64, 0.758473684],
+        'Paciente':[pdp1, pdp2, pdp3, pdp4]
+    }, index=['Mês1', 'Mês3', 'Mês6', 'Mês9'])
+    plt.figure()
+    lines.plot.line()
+    plt.savefig("./app/static/images/grafico.png")
+
+    data = {}
+    data['db'] = {}
+    data['db'] = ({'prob': round(prob[0][1], 2)*100, 'pdp4': round(pdp4, 2)*100, 'id': pk})
+    return render(request, 'prevPred.html', data)
 
 """
 def Prediçao(request, pk):
-    # global rf, acc, pre, f1, auc
-    # df = pd.DataFrame(list(Pacientes.objects.all().values()))
-    # df["mes1"].fillna(-1, inplace=True)
-    # df["mes3"].fillna(-1, inplace=True)
-    # df["mes6"].fillna(-1, inplace=True)
-    # df["mes9"].fillna(-1, inplace=True)
-    # df["ano1"].fillna(-1, inplace=True)
-    # df["ano2"].fillna(-1, inplace=True)
-    # df["ano3"].fillna(-1, inplace=True)
-    # df["ano4"].fillna(-1, inplace=True)
-    # df["ano5"].fillna(-1, inplace=True)
-    # paciente = df.loc[df["id"] == pk]
-    # paciente = paciente[["tpo", "mes1", "mes3", "mes6", "mes9",
-    #                      "ano1", "ano2", "ano3", "ano4", "ano5"]]
-    # prob = rf.predict_proba(paciente)
-    # data = {}
-    # data['db'] = {}
-    # data['db'] = ({'prob': round(prob[0][1], 2)*100, 'id': pk})
+    global rf, acc, pre, f1, auc
+    df = pd.DataFrame(list(Pacientes.objects.all().values()))
+    df["mes1"].fillna(-1, inplace=True)
+    df["mes3"].fillna(-1, inplace=True)
+    df["mes6"].fillna(-1, inplace=True)
+    df["mes9"].fillna(-1, inplace=True)
+    df["ano1"].fillna(-1, inplace=True)
+    df["ano2"].fillna(-1, inplace=True)
+    df["ano3"].fillna(-1, inplace=True)
+    df["ano4"].fillna(-1, inplace=True)
+    df["ano5"].fillna(-1, inplace=True)
+    paciente = df.loc[df["id"] == pk]
+    paciente = paciente[["tpo", "mes1", "mes3", "mes6", "mes9",
+                         "ano1", "ano2", "ano3", "ano4", "ano5"]]
+    prob = rf.predict_proba(paciente)
+    data = {}
+    data['db'] = {}
+    data['db'] = ({'prob': round(prob[0][1], 2)*100, 'id': pk})
     return render(request, 'prediçao.html', data)
 
 
 def Previsao(request, pk):
-    # global df, lr, mae, mse, rmse
-    # df = pd.DataFrame(list(Pacientes.objects.all().values()))
-    # paciente = df.loc[df["id"] == pk]
-    # pdp1 = 0.25
-    # pdp2 = 0.45
-    # pdp3 = 0.64
-    # try:
-    #     pdp1 = paciente["mes1"]
-    # except Exception:
-    #     pass
-    # try:
-    #     pdp2 = paciente["mes3"]
-    # except Exception:
-    #     pass
-    # try:
-    #     pdp3 = paciente["mes6"]
-    # except Exception:
-    #     pass
-    # paciente["PDP1"] = pdp1
-    # paciente["PDP2"] = pdp2
-    # paciente["PDP3"] = pdp3
-    # paciente = paciente[["PDP1", "PDP2", "PDP3"]]
-    # print(paciente)
-    # pdp4 = lr.predict(paciente)
-    # data = {}
-    # data['db'] = {}
-    # data['db'] = ({'pdp4': round(pdp4[0], 2)*100, 'rmse': rmse,
-    #                'mae': mae, 'mse': mse, 'id': pk})
+    global df, lr, mae, mse, rmse
+    df = pd.DataFrame(list(Pacientes.objects.all().values()))
+    paciente = df.loc[df["id"] == pk]
+    pdp1 = 0.25
+    pdp2 = 0.45
+    pdp3 = 0.64
+    try:
+        pdp1 = paciente["mes1"].values[0]
+    except Exception:
+        pass
+    try:
+        pdp2 = paciente["mes3"].values[0]
+    except Exception:
+        pass
+    try:
+        pdp3 = paciente["mes6"].values[0]
+    except Exception:
+        pass
+    paciente["PDP1"] = pdp1
+    paciente["PDP2"] = pdp2
+    paciente["PDP3"] = pdp3
+    paciente = paciente[["PDP1", "PDP2", "PDP3"]]
+    pdp4 = lr.predict(paciente)[0]
+    lines = pd.DataFrame({
+        'Média':[0.25, 0.45, 0.64, 0.758473684],
+        'Paciente':[pdp1, pdp2, pdp3, pdp4]
+    }, index=['Mês1', 'Mês3', 'Mês6', 'Mês9'])
+    plt.figure()
+    lines.plot.line()
+    plt.savefig("grafico.png")
+    data = {}
+    data['db'] = {}
+    data['db'] = ({'pdp4': round(pdp4, 2)*100, 'rmse': rmse,
+                   'mae': mae, 'mse': mse, 'id': pk})
+
     return render(request, 'previsao.html', data)
+"""
