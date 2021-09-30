@@ -18,6 +18,9 @@ import numpy as np
 # Create your views here.
 
 
+def login(request):
+    return render(request, 'login.html')
+
 def home(request):
     data = {}
     search = request.GET.get("q")
@@ -430,10 +433,10 @@ def Regressor():
     return lr, mae, mse, rmse
 
 
-rf, acc, pre, f1, auc = ClassificadorLOO()
+# rf, acc, pre, f1, auc = ClassificadorLOO()
 # ClassificadorKF()
 print("Classificador Pronto")
-lr, mae, mse, rmse = Regressor()
+# lr, mae, mse, rmse = Regressor()
 print("Regressor Pronto")
 # acc = round(acc, 2)*100
 # pre = round(acc, 2)*100

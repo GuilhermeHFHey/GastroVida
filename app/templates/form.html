@@ -20,34 +20,14 @@
             Voltar
         </a>
     </div>
-
+    {% load crispy_forms_tags %}
     <div class="col-8 m-auto pt-4 pb-2 text-center">
         <div id="result"></div>
 
         <form name="form" id="form" action="{% if db %}/update/{{db.id}}/{%else%}/create/{%endif%}" method="post">
             {% csrf_token %}
             <!--{{form.as_p}}-->
-            <div class="form-group mt-4">Nome: {{form.nome}}</div>
-            <div class="form-group mt-4">Idade: {{form.idade}}</div>
-            <div class="form-group mt-4">Sexo: {{form.sexo}}</div>
-            <div class="form-group mt-4">IMC: {{form.imc}}</div>
-            <div class="form-group mt-4">Altura: {{form.altura}}</div>
-            <div class="form-group mt-4">CA (Circunferência Abdominal): {{form.ca}}</div>
-            <div class="form-group mt-4">RCQ (Relação Cintura-Quadril): {{form.rcq}}</div>
-            <div class="form-group mt-4">Gordura Corporal: {{form.gc}}</div>
-            <div class="form-group mt-4">Tipo de Cirurgia: {{form.cx}}</div>
-            <div class="form-group mt-4">Data da Cirurgia: {{form.data}}</div>
-            <div class="form-group mt-4">Alta Cirurgia: {{form.alta}}</div>
-            <div class="form-group mt-4">Tempo pós-operatório: {{form.tpo}}</div>
-            <div class="form-group mt-4">Mês 1: {{form.mes1}}</div>
-            <div class="form-group mt-4">Mês 3: {{form.mes3}}</div>
-            <div class="form-group mt-4">Mês 6: {{form.mes6}}</div>
-            <div class="form-group mt-4">Mês 9: {{form.mes9}}</div>
-            <div class="form-group mt-4">Ano 1: {{form.ano1}}</div>
-            <div class="form-group mt-4">Ano 2: {{form.ano2}}</div>
-            <div class="form-group mt-4">Ano 3: {{form.ano3}}</div>
-            <div class="form-group mt-4">Ano 4: {{form.ano4}}</div>
-            <div class="form-group mt-4">Ano 5: {{form.ano5}}</div>
+            {{ form|crispy }}
             <input type="submit" class="btn btn-success" value="Salvar">
         </form>
     </div>
