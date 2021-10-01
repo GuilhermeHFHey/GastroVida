@@ -1,4 +1,5 @@
 from django.db import models
+from django.forms.fields import ChoiceField
 
 # Create your models here.
 
@@ -11,9 +12,13 @@ class Profissional(models.Model):
 
 
 class Pacientes(models.Model):
+    SEXO = (
+        ('M', 'Masculino'),
+        ('F', 'Feminino'),
+    )
     nome = models.CharField(max_length=150, blank=True, null=True)
     idade = models.IntegerField(blank=True, null=True)
-    sexo = models.CharField(blank=True, null=True, max_length=1)
+    sexo = models.CharField(blank=True, null=True, max_length=1, choices=SEXO)
     imc = models.FloatField(blank=True, null=True, max_length=4)
     altura = models.FloatField(blank=True, null=True,
                                max_length=30)

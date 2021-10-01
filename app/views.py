@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from app.forms import PacientesForm
+from app.forms import LoginForm, PacientesForm
 from app.models import Pacientes, Profissional
 from django.template.loader import render_to_string
 from django.http import JsonResponse
@@ -19,7 +19,27 @@ import numpy as np
 
 
 def login(request):
-    return render(request, 'login.html')
+    data = {}
+    data['form'] = LoginForm()
+    return render(request, 'login.html', data)
+
+
+def validar(request):
+    form = LoginForm(request.POST or None)
+    if form.is_valid():
+        try:
+            proficional = Profissional.objects.get(login=form.cleaned_data['login'])
+        except:
+            proficional = None
+        print(proficional.senha == form.cleaned_data['senha'])
+        if proficional == None:
+            return redirect('login')
+        else:
+            if proficional.senha == form.cleaned_data['senha']:
+                return redirect('home')
+            else:
+                return redirect('login')
+
 
 def home(request):
     data = {}

@@ -1,11 +1,15 @@
-<!DOCTYPE>
+{% extends 'modelo.html' %}
+<!DOCTYPE html>
 <html lang="pt-br">
 <head>
+    {% block head%}
     <meta charset="UTF-8">
     <title>Formulario</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    {% endblock %}
 </head>
 <body>
+    {% block corpo %}
     <div class="col-8 m-auto pt-2 pb-2 text-center">
         <h1><inS>Cadastro</inS></h1>
     </div>
@@ -26,13 +30,91 @@
 
         <form name="form" id="form" action="{% if db %}/update/{{db.id}}/{%else%}/create/{%endif%}" method="post">
             {% csrf_token %}
-            <!--{{form.as_p}}-->
-            {{ form|crispy }}
-            <input type="submit" class="btn btn-success" value="Salvar">
+            <div style="margin: 20px;" class="form-group row">
+                <div class="form-group col-md-4 mb-0">
+                    {{ form.nome|as_crispy_field }}
+                </div>
+                <div class="form-group col-md-4 mb-0">
+                    {{ form.idade|as_crispy_field }}
+                </div>
+                <div class="form-group col-md-4 mb-0">
+                    {{ form.sexo|as_crispy_field }}
+                </div>
+            </div>
+            <div style="margin: 20px;" class="form-group row">
+                <div class="form-group col-md-6 mb-0">
+                    {{ form.imc|as_crispy_field }}
+                </div>
+                <div class="form-group col-md-6 mb-0">
+                    {{ form.gc|as_crispy_field }}
+                </div>
+            </div>
+            <div style="margin: 20px;" class="form-group row">
+                <div class="form-group col-md-4 mb-0">
+                    {{ form.altura|as_crispy_field }}
+                </div>
+                <div class="form-group col-md-4 mb-0">
+                    {{ form.ca|as_crispy_field }}
+                </div>
+                <div class="form-group col-md-4 mb-0">
+                    {{ form.rcq|as_crispy_field }}
+                </div>
+            </div>
+            <div style="margin: 20px;" class="form-group row">
+                <div class="form-group col-md-4 mb-0">
+                    {{ form.data|as_crispy_field }}
+                </div>
+                <div class="form-group col-md-4 mb-0">
+                    {{ form.alta|as_crispy_field }}
+                </div>
+                <div class="form-group col-md-4 mb-0">
+                    {{ form.tpo|as_crispy_field }}
+                </div>
+            </div>
+            <div style="margin: 20px;" class="form-group row">
+                <div class="form-group col-md-3 mb-0">
+                    {{ form.mes1|as_crispy_field }}
+                </div>
+                <div class="form-group col-md-3 mb-0">
+                    {{ form.mes3|as_crispy_field }}
+                </div>
+                <div class="form-group col-md-3 mb-0">
+                    {{ form.mes6|as_crispy_field }}
+                </div>
+                <div class="form-group col-md-3 mb-0">
+                    {{ form.mes9|as_crispy_field }}
+                </div>
+            </div>
+            <div style="margin: 20px;" class="form-group row">
+                <div class="form-group col-md-4 mb-0">
+                    {{ form.ano1|as_crispy_field }}
+                </div>
+                <div class="form-group col-md-4 mb-0">
+                    {{ form.ano2|as_crispy_field }}
+                </div>
+                <div class="form-group col-md-4 mb-0">
+                    {{ form.ano3|as_crispy_field }}
+                </div>
+            </div>
+            <div style="margin: 20px;" class="form-group row">
+                <div class="form-group col-md-6 mb-0">
+                    {{ form.ano4|as_crispy_field }}
+                </div>
+                <div class="form-group col-md-6 mb-0">
+                    {{ form.ano5|as_crispy_field }}
+                </div>
+            </div>
+            <div style="margin: 20px auto; width: 10%;" class="form-group row">
+                {{ form.proficional|as_crispy_field }}
+            </div>
+            <div style="margin: 20px;">
+                <input type="submit" class="btn btn-success" value="Salvar">
+            </div>
         </form>
     </div>
 
     {% load static %}
     <script src="{% static 'javascript.js' %}"></script>
+    {% endblock %}
 </body>
 </html>
