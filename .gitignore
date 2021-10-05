@@ -2,3 +2,4 @@
 app/__pycache__/*.pyc
 app/*.pyc
 projeto/__pycache__/*.pyc
+app/__pycache__/views.cpython-39.pyc
