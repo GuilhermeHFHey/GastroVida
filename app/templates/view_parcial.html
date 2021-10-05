@@ -1,0 +1,102 @@
+<table class="table table-bordered table-hover">
+        <thead class="btn-dark">
+            <tr class="table-success">
+                <th scope="col">Nome</th>
+                <th scope="col">Idade</th>
+                <th scope="col">Sexo</th>
+                <th scope="col">IMC</th>
+                <th scope="col">Altura</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% if db %}
+            <tr>
+                <td> {{db.nome}} </td>
+                <td> {{db.idade}} </td>
+                <td> {{db.sexo}} </td>
+                <td> {{db.imc}} </td>
+                <td> {{db.altura}} </td>
+            </tr>
+        {% endif %}
+        {%load static%}
+        <script src="{% static 'javascript.js' %}"></script>
+        </tbody>
+</table>
+
+<table class="table table-bordered table-hover">
+        <thead class="btn-dark">
+            <tr class="table-success">
+                <th scope="col">CA</th>
+                <th scope="col">RCQ</th>
+                <th scope="col">%GC</th>
+                <th scope="col">CX</th>
+                <th scope="col">Data da Cirurgia</th>
+                <th scope="col">Alta</th>
+                <th scope="col">TPO</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% if db %}
+            <tr>
+                <td> {{db.ca}} </td>
+                <td> {{db.rcq}} </td>
+                <td> {{db.gc}} </td>
+                <td> {{db.cx}} </td>
+                <td> {{db.data}} </td>
+                <td> {{db.alta}} </td>
+                <td> {{db.tpo}} </td>
+            </tr>
+        {% endif %}
+        {%load static%}
+        <script src="{% static 'javascript.js' %}"></script>
+        </tbody>
+</table>
+
+
+<table class="table table-bordered table-hover">
+        <thead class="btn-dark">
+            <tr class="table-success">
+                <th scope="col">Mês 1:</th>
+                <th scope="col">Mês 3:</th>
+                <th scope="col">Mês 6:</th>
+                <th scope="col">Mês 9:</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% if db %}
+            <tr>
+                <td> {{db.mes1}} </td>
+                <td> {{db.mes3}} </td>
+                <td> {{db.mes6}} </td>
+                <td> {{db.mes9}} </td>
+            </tr>
+        {% endif %}
+        {%load static%}
+        <script src="{% static 'javascript.js' %}"></script>
+        </tbody>
+</table>
+
+<table class="table table-bordered table-hover">
+        <thead class="btn-dark">
+            <tr class="table-success">
+                <th scope="col">Ano 1:</th>
+                <th scope="col">Ano 2:</th>
+                <th scope="col">Ano 3:</th>
+                <th scope="col">Ano 4:</th>
+                <th scope="col">Ano 5:</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% if db %}
+            <tr>
+                <td> {{db.ano1}} </td>
+                <td> {{db.ano2}} </td>
+                <td> {{db.ano3}} </td>
+                <td> {{db.ano4}} </td>
+                <td> {{db.ano5}} </td>
+            </tr>
+        {% endif %}
+        {%load static%}
+        <script src="{% static 'javascript.js' %}"></script>
+        </tbody>
+</table>
