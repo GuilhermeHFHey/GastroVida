@@ -7,6 +7,7 @@ from django.forms.models import ModelChoiceField, ModelMultipleChoiceField
 from django.forms.widgets import PasswordInput, TextInput
 from pandas.core import api
 from app.models import Pacientes, Profissional
+from django.contrib.auth import get_user_model
 
 # Create the form class.
 
@@ -51,11 +52,18 @@ class PacientesForm(ModelForm):
             widget=forms.CheckboxSelectMultiple)
 
 class LoginForm(forms.Form):
-    login = IntegerField(required=True, widget=TextInput(attrs={'placeholder': 'Insira seu Login'}))
-    senha = IntegerField(widget=forms.PasswordInput(attrs={'placeholder': 'Insira sua Senha'}), required=True)
+    username = CharField(required=True, widget=TextInput(attrs={'placeholder': 'Insira seu Login'}))
+    password = CharField(widget=forms.PasswordInput(attrs={'placeholder': 'Insira sua Senha'}), required=True)
 
     def cleaned(self):
         data = {}
         data['login'] = self.cleaned_data['login']
         data['senha'] = self.cleaned_data['senha']
         return data
+
+user = get_user_model()
+class RegisterForm(forms.Form):
+    nome = forms.CharField(max_length=150)
+    prof = forms.CharField(max_length=150)
+    username = forms.CharField(max_length=150)
+    password = forms.CharField(max_length=150)

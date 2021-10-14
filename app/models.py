@@ -1,15 +1,13 @@
 from django.db import models
 from django.forms.fields import ChoiceField
+from django.contrib.auth.models import AbstractUser
 
-# Create your models here.
+# # Create your models here.
 
 
-class Profissional(models.Model):
-    nome = models.CharField(max_length=150)
-    login = models.IntegerField()
-    senha = models.IntegerField()
-    prof = models.CharField(max_length=150)
-
+class Profissional(AbstractUser):
+    nome = models.CharField(max_length=150, editable=False)
+    prof = models.CharField(max_length=150, editable=False)
 
 class Pacientes(models.Model):
     SEXO = (

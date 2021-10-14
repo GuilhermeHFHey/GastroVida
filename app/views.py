@@ -1,5 +1,6 @@
+from django.forms.fields import NullBooleanField
 from django.shortcuts import render, redirect
-from app.forms import LoginForm, PacientesForm
+from app.forms import LoginForm, PacientesForm, RegisterForm
 from app.models import Pacientes, Profissional
 from django.template.loader import render_to_string
 from django.http import JsonResponse
@@ -15,58 +16,74 @@ from imblearn.under_sampling import RandomUnderSampler
 import matplotlib.pyplot as plt
 import seaborn as sn
 import numpy as np
+from django.contrib.auth import authenticate, login, get_user_model, logout
+
 # Create your views here.
 
 
-def login(request):
-    data = {}
-    data['form'] = LoginForm()
+def loginPage(request):
+    if request.user.is_authenticated:
+        logout(request)
+
+    form = LoginForm(request.POST or None)
+    data = {"form":form}
+    if request.method == "POST" and form.is_valid():
+        username = form.cleaned_data['username']
+        password = form.cleaned_data['password']
+        user = authenticate(request, username=username, password=password)
+        if user is not None:
+            login(request, user)
+            return redirect("home")
+        else:
+            print("login invalido")
     return render(request, 'login.html', data)
 
 
-def validar(request):
-    form = LoginForm(request.POST or None)
-    if form.is_valid():
-        try:
-            proficional = Profissional.objects.get(login=form.cleaned_data['login'])
-        except:
-            proficional = None
-        print(proficional.senha == form.cleaned_data['senha'])
-        if proficional == None:
-            return redirect('login')
-        else:
-            if proficional.senha == form.cleaned_data['senha']:
-                return redirect('home')
-            else:
-                return redirect('login')
+User = get_user_model()
+def registerPage(request):
+    form = RegisterForm(request.POST or None)
+    data = {"form": form}
+    if request.method == "POST" and form.is_valid():
+        nome = form.cleaned_data.get("nome")
+        username = form.cleaned_data["username"]
+        password = form.cleaned_data["password"]
+        prof = form.cleaned_data["prof"]
+        newUser = User.objects.create_user(nome=nome, prof=prof, username=username, password=password)
+    return render(request, "register.html", data)
 
 
 def home(request):
-    data = {}
-    search = request.GET.get("q")
-    if search:
-        pacientes = Pacientes.objects.filter(nome__icontains=search)
-    else:
-        pacientes = Pacientes.objects.all()
-    paginator = Paginator(pacientes, 10)
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
-    data['db'] = page_obj
-    if request.is_ajax():
-        html = render_to_string(
-            template_name="index_partial.html",
-            context={'db': pacientes}
-        )
-        data_dict = {"html_from_view": html}
-        return JsonResponse(data=data_dict, safe=False)
+    if request.user.is_authenticated:
+        data = {}
+        search = request.GET.get("q")
+        if search:
+            pacientes = Pacientes.objects.filter(nome__icontains=search)
+        else:
+            pacientes = Pacientes.objects.all()
+        paginator = Paginator(pacientes, 10)
+        page_number = request.GET.get('page')
+        page_obj = paginator.get_page(page_number)
+        data['db'] = page_obj
+        if request.is_ajax():
+            html = render_to_string(
+                template_name="index_partial.html",
+                context={'db': pacientes}
+            )
+            data_dict = {"html_from_view": html}
+            return JsonResponse(data=data_dict, safe=False)
 
-    return render(request, 'index.html', data)
+        return render(request, 'index.html', data)
+    else:
+        return redirect('login')
 
 
 def form(request):
-    data = {}
-    data['form'] = PacientesForm()
-    return render(request, 'form.html', data)
+    if request.user.is_authenticated:
+        data = {}
+        data['form'] = PacientesForm()
+        return render(request, 'form.html', data)
+    else:
+        return redirect('login')
 
 
 def create(request):
@@ -77,16 +94,22 @@ def create(request):
 
 
 def view(request, pk):
-    data = {}
-    data['db'] = Pacientes.objects.get(pk=pk)
-    return render(request, 'view.html', data)
+    if request.user.is_authenticated:
+        data = {}
+        data['db'] = Pacientes.objects.get(pk=pk)
+        return render(request, 'view.html', data)
+    else:
+        return redirect('login')
 
 
 def edit(request, pk):
-    data = {}
-    data['db'] = Pacientes.objects.get(pk=pk)
-    data['form'] = PacientesForm(instance=data['db'])
-    return render(request, 'form.html', data)
+    if request.user.is_authenticated:
+        data = {}
+        data['db'] = Pacientes.objects.get(pk=pk)
+        data['form'] = PacientesForm(instance=data['db'])
+        return render(request, 'form.html', data)
+    else:
+        return redirect('login')
 
 
 def update(request, pk):
@@ -138,7 +161,7 @@ def uploadExel(request):
                 paciente[19],
                 paciente[20],
             )
-            p = Profissional.objects.get(pk=1)
+            p = Profissional.objects.get(pk=3)
             value.save()
             value.proficional.add(p)
 
@@ -147,88 +170,91 @@ def uploadExel(request):
 
 def dataFrame():
     df = pd.DataFrame(list(Pacientes.objects.all().values()))
-    df["mes1"].fillna(-1, inplace=True)
-    df["mes3"].fillna(-1, inplace=True)
-    df["mes6"].fillna(-1, inplace=True)
-    df["mes9"].fillna(-1, inplace=True)
-    df["ano1"].fillna(-1, inplace=True)
-    df["ano2"].fillna(-1, inplace=True)
-    df["ano3"].fillna(-1, inplace=True)
-    df["ano4"].fillna(-1, inplace=True)
-    df["ano5"].fillna(-1, inplace=True)
-    Abandonos = []
-    ProximasConsultas = []
-    pdps1 = []
-    pdps2 = []
-    pdps3 = []
-    pdps4 = []
-    for index, row in df.iterrows():
-        pdp1 = 0.25
-        pdp2 = 0.45
-        pdp3 = 0.64
-        pdp4 = 0.75
-        if row["mes1"] != -1:
-            pdp1 = row["mes1"]
-        if row["mes3"] != -1:
-            pdp2 = row["mes3"]
-        if row["mes6"] != -1:
-            pdp3 = row["mes6"]
-        if row["mes9"] != -1:
-            pdp4 = row["mes9"]
+    if df is not None:
+        df["mes1"].fillna(-1, inplace=True)
+        df["mes3"].fillna(-1, inplace=True)
+        df["mes6"].fillna(-1, inplace=True)
+        df["mes9"].fillna(-1, inplace=True)
+        df["ano1"].fillna(-1, inplace=True)
+        df["ano2"].fillna(-1, inplace=True)
+        df["ano3"].fillna(-1, inplace=True)
+        df["ano4"].fillna(-1, inplace=True)
+        df["ano5"].fillna(-1, inplace=True)
+        Abandonos = []
+        ProximasConsultas = []
+        pdps1 = []
+        pdps2 = []
+        pdps3 = []
+        pdps4 = []
+        for index, row in df.iterrows():
+            pdp1 = 0.25
+            pdp2 = 0.45
+            pdp3 = 0.64
+            pdp4 = 0.75
+            if row["mes1"] != -1:
+                pdp1 = row["mes1"]
+            if row["mes3"] != -1:
+                pdp2 = row["mes3"]
+            if row["mes6"] != -1:
+                pdp3 = row["mes6"]
+            if row["mes9"] != -1:
+                pdp4 = row["mes9"]
 
-        abandono = False
-        proximaConsulta = ""
-        consultaAtual = row["tpo"]/365
-        if consultaAtual <= 0.07:
-            proximaConsulta = "mes1"
-        elif 0.07 < consultaAtual <= 0.25:
-            proximaConsulta = "mes3"
-        elif 0.25 < consultaAtual <= 0.5:
-            proximaConsulta = "mes6"
-            if row["mes3"] == -1 and row["mes1"] == -1:
-                abandono = True
-        elif 0.5 < consultaAtual <= 0.75:
-            proximaConsulta = "mes9"
-            if row["mes6"] == -1 and row["mes3"] == -1:
-                abandono = True
-        elif 0.75 < consultaAtual <= 1:
-            proximaConsulta = "ano1"
-            if row["mes9"] == -1 and row["mes6"] == -1:
-                abandono = True
-        elif 1 < consultaAtual <= 2:
-            proximaConsulta = "ano2"
-            if row["ano1"] == -1 and row["mes9"] == -1:
-                abandono = True
-        elif 2 < consultaAtual <= 3:
-            proximaConsulta = "ano3"
-            if row["ano1"] == -1 and row["ano2"] == -1:
-                abandono = True
-        elif 3 < consultaAtual <= 4:
-            proximaConsulta = "ano4"
-            if row["ano3"] == -1 and row["ano2"] == -1:
-                abandono = True
-        elif 4 < consultaAtual <= 5:
-            proximaConsulta = "ano5"
-            if row["ano4"] == -1 and row["ano3"] == -1:
-                abandono = True
-        else:
-            if row["ano5"] == -1 and row["ano4"] == -1:
-                abandono = True
-        pdps1.append(pdp1)
-        pdps2.append(pdp2)
-        pdps3.append(pdp3)
-        pdps4.append(pdp4)
-        Abandonos.append(abandono)
-        ProximasConsultas.append(proximaConsulta)
+            abandono = False
+            proximaConsulta = ""
+            consultaAtual = row["tpo"]/365
+            if consultaAtual <= 0.07:
+                proximaConsulta = "mes1"
+            elif 0.07 < consultaAtual <= 0.25:
+                proximaConsulta = "mes3"
+            elif 0.25 < consultaAtual <= 0.5:
+                proximaConsulta = "mes6"
+                if row["mes3"] == -1 and row["mes1"] == -1:
+                    abandono = True
+            elif 0.5 < consultaAtual <= 0.75:
+                proximaConsulta = "mes9"
+                if row["mes6"] == -1 and row["mes3"] == -1:
+                    abandono = True
+            elif 0.75 < consultaAtual <= 1:
+                proximaConsulta = "ano1"
+                if row["mes9"] == -1 and row["mes6"] == -1:
+                    abandono = True
+            elif 1 < consultaAtual <= 2:
+                proximaConsulta = "ano2"
+                if row["ano1"] == -1 and row["mes9"] == -1:
+                    abandono = True
+            elif 2 < consultaAtual <= 3:
+                proximaConsulta = "ano3"
+                if row["ano1"] == -1 and row["ano2"] == -1:
+                    abandono = True
+            elif 3 < consultaAtual <= 4:
+                proximaConsulta = "ano4"
+                if row["ano3"] == -1 and row["ano2"] == -1:
+                    abandono = True
+            elif 4 < consultaAtual <= 5:
+                proximaConsulta = "ano5"
+                if row["ano4"] == -1 and row["ano3"] == -1:
+                    abandono = True
+            else:
+                if row["ano5"] == -1 and row["ano4"] == -1:
+                    abandono = True
+            pdps1.append(pdp1)
+            pdps2.append(pdp2)
+            pdps3.append(pdp3)
+            pdps4.append(pdp4)
+            Abandonos.append(abandono)
+            ProximasConsultas.append(proximaConsulta)
 
-    df["Abandono"] = Abandonos
-    df["ProximaConsulta"] = ProximasConsultas
-    df["PDP1"] = pdps1
-    df["PDP2"] = pdps2
-    df["PDP3"] = pdps3
-    df["PDP4"] = pdps4
+        df["Abandono"] = Abandonos
+        df["ProximaConsulta"] = ProximasConsultas
+        df["PDP1"] = pdps1
+        df["PDP2"] = pdps2
+        df["PDP3"] = pdps3
+        df["PDP4"] = pdps4
 
-    return df
+        return df
+    else:
+        return None
 
 
 df = dataFrame()
@@ -451,7 +477,6 @@ def Regressor():
     lr.fit(X, y)
 
     return lr, mae, mse, rmse
-
 
 rf, acc, pre, f1, auc = ClassificadorLOO()
 # ClassificadorKF()

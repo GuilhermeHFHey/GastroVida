@@ -1,5 +1,16 @@
 *.pyc
-app/__pycache__/*.pyc
+.app/__pycache__/*
+.projeto/__pycache__/*
 app/*.pyc
 projeto/__pycache__/*.pyc
 app/__pycache__/views.cpython-39.pyc
+
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+*.code-workspace
+
+# Local History for Visual Studio Code
+.history/
