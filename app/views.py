@@ -523,13 +523,11 @@ def PrevPred(request, pk):
     paciente["PDP1"] = pdp1
     paciente["PDP2"] = pdp2
     paciente["PDP3"] = pdp3
-    pdp4original = paciente["mes9"].values[0] if paciente["mes9"].values[0] != -1 else 0.75
     paciente = paciente[["PDP1", "PDP2", "PDP3"]]
     pdp4 = lr.predict(paciente)[0]
     lines = pd.DataFrame({
         'Média':[0.25, 0.45, 0.64, 0.75],
         'Paciente Previsto':[pdp1, pdp2, pdp3, pdp4],
-        'Paciente Original':[pdp1, pdp2, pdp3, pdp4original]
     }, index=['Mês1', 'Mês3', 'Mês6', 'Mês9'])
     plt.figure()
     lines.plot.line()
