@@ -1,0 +1,26 @@
+{% extends 'modelo.html' %}
+{% block head %}
+<meta charset="UTF-8">
+<title>Inicio</title>
+{% endblock %}
+{% block corpo %}   
+{% load static %}
+<div style="height: 400px; width: 100vw; margin: 0;" class="row">
+    <div style="width: 100vw; height: 100%; position: relative; background-image: linear-gradient(to right, #0088ff, #00ffd0);" class="container">
+      <a style="position: absolute; left: 0; bottom: 10%;" class="navbar-brand" aria-current="page" href="/" ><img width="700" height="250" src="{% static '/images/gastrovida.jpeg' %}" alt=""></a>
+    </div>
+</div>
+<div style="margin: auto; margin-top: 50px; min-height: auto; ">
+    <div class="list-group list-group-horizontal" style="width: 50%; height: 50%; margin: auto;">
+        <a href="/" class="list-group-item list-group-item-action" style="text-align: center;">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="150" height="150"><path d="M12 2.5a5.25 5.25 0 00-2.519 9.857 9.005 9.005 0 00-6.477 8.37.75.75 0 00.727.773H20.27a.75.75 0 00.727-.772 9.005 9.005 0 00-6.477-8.37A5.25 5.25 0 0012 2.5z"></path></svg>
+            <h1>Listar Pacientes</h1>
+        </a>
+        <div style="width: 100px;"></div>
+        <a href="form/" class="list-group-item list-group-item-action" style="text-align: center;">
+            <svg style="margin-left: 15%;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="150" height="150"><path fill-rule="evenodd" d="M19.25 1a.75.75 0 01.75.75V4h2.25a.75.75 0 010 1.5H20v2.25a.75.75 0 01-1.5 0V5.5h-2.25a.75.75 0 010-1.5h2.25V1.75a.75.75 0 01.75-.75zM9 6a3.5 3.5 0 100 7 3.5 3.5 0 000-7zM4 9.5a5 5 0 117.916 4.062 7.973 7.973 0 015.018 7.166.75.75 0 11-1.499.044 6.469 6.469 0 00-12.932 0 .75.75 0 01-1.499-.044 7.973 7.973 0 015.059-7.181A4.993 4.993 0 014 9.5z"></path></svg>
+            <h1>Adicionar Paciente</h1>
+        </a>
+    </div>
+</div>
+{% endblock %}

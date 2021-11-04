@@ -33,7 +33,7 @@ def loginPage(request):
         user = authenticate(request, username=username, password=password)
         if user is not None:
             login(request, user)
-            return redirect("home")
+            return redirect("initial")
         else:
             print("login invalido")
     return render(request, 'login.html', data)
@@ -50,6 +50,13 @@ def registerPage(request):
         prof = form.cleaned_data["prof"]
         newUser = User.objects.create_user(nome=nome, prof=prof, username=username, password=password)
     return render(request, "register.html", data)
+
+
+def initial(request):
+    if request.user.is_authenticated:
+        return render(request, 'home.html')
+    else:
+        return redirect('login')
 
 
 def home(request):
@@ -257,7 +264,7 @@ def dataFrame():
         return None
 
 
-df = dataFrame()
+# df = dataFrame()
 
 
 def ClassificadorLOO():
@@ -478,17 +485,17 @@ def Regressor():
 
     return lr, mae, mse, rmse
 
-rf, acc, pre, f1, auc = ClassificadorLOO()
-# ClassificadorKF()
-print("Classificador Pronto")
-lr, mae, mse, rmse = Regressor()
-print("Regressor Pronto")
+# rf, acc, pre, f1, auc = ClassificadorLOO()
+# # ClassificadorKF()
+# print("Classificador Pronto")
+# lr, mae, mse, rmse = Regressor()
+# print("Regressor Pronto")
 # acc = round(acc, 2)*100
 # pre = round(acc, 2)*100
 # f1 = round(acc, 2)*100
 # auc = round(acc, 2)*100
 
-
+""""
 def PrevPred(request, pk):
     global rf, lr
     df = pd.DataFrame(list(Pacientes.objects.all().values()))
@@ -537,7 +544,7 @@ def PrevPred(request, pk):
     data['db'] = {}
     data['db'] = ({'prob': round(prob[0][1], 2)*100, 'pdp4': round(pdp4, 2)*100, 'id': pk})
     return render(request, 'prevPred.html', data)
-
+"""
 """
 def Prediçao(request, pk):
     global rf, acc, pre, f1, auc
