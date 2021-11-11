@@ -52,8 +52,8 @@ class PacientesForm(ModelForm):
             widget=forms.CheckboxSelectMultiple)
 
 class LoginForm(forms.Form):
-    username = CharField(required=True, widget=TextInput(attrs={'placeholder': 'Insira seu Login'}))
-    password = CharField(widget=forms.PasswordInput(attrs={'placeholder': 'Insira sua Senha'}), required=True)
+    username = CharField(required=True, widget=TextInput(attrs={'placeholder': 'Insira seu Login'}), label="Usuário")
+    password = CharField(widget=forms.PasswordInput(attrs={'placeholder': 'Insira sua Senha'}), required=True, label="Senha")
 
     def cleaned(self):
         data = {}

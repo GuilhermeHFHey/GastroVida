@@ -174,7 +174,7 @@ def uploadExel(request):
 
     return render(request, 'import.html')
 
-
+"""
 def dataFrame():
     df = pd.DataFrame(list(Pacientes.objects.all().values()))
     if df is not None:
@@ -264,7 +264,7 @@ def dataFrame():
         return None
 
 
-# df = dataFrame()
+df = dataFrame()
 
 
 def ClassificadorLOO():
@@ -338,7 +338,7 @@ def ClassificadorLOO():
     rf = RandomForestClassifier()
     rf.fit(X, y)
     return rf, acc, pre, f1, auc
-
+"""
 """
 def ClassificadorKF():
     global df
@@ -434,7 +434,7 @@ def plot_roc_curve(fper, tper):
     plt.legend()
     plt.savefig("ROC.png")
 """
-
+"""
 def Regressor():
     global df
     X = df[["PDP1", "PDP2", "PDP3"]]
@@ -485,17 +485,17 @@ def Regressor():
 
     return lr, mae, mse, rmse
 
-# rf, acc, pre, f1, auc = ClassificadorLOO()
-# # ClassificadorKF()
-# print("Classificador Pronto")
-# lr, mae, mse, rmse = Regressor()
-# print("Regressor Pronto")
+rf, acc, pre, f1, auc = ClassificadorLOO()
+# ClassificadorKF()
+print("Classificador Pronto")
+lr, mae, mse, rmse = Regressor()
+print("Regressor Pronto")
 # acc = round(acc, 2)*100
 # pre = round(acc, 2)*100
 # f1 = round(acc, 2)*100
 # auc = round(acc, 2)*100
 
-""""
+
 def PrevPred(request, pk):
     global rf, lr
     df = pd.DataFrame(list(Pacientes.objects.all().values()))

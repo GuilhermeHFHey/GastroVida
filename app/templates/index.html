@@ -2,12 +2,12 @@
 
     {% block head%}
     <meta charset="UTF-8">
-    <title>CRUD Gastro</title>
+    <title>Pacientes</title>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     {% endblock %}
 
     {% block corpo %}
-    <div style="margin-top: 100px; color: white;">
+<div style="margin-top: 20px;" class="container-fluid">
     <div class="col-8 m-auto pt-2 pb-2 text-center">
         <h1><inS>Pacientes</inS></h1>
     </div>
@@ -35,6 +35,6 @@
         {% endif %}
     </ul>
 </div>
-    {%load static%}
-    <script src="{% static 'javascript.js' %}"></script>
-    {% endblock %}
+{%load static%}
+<script src="{% static 'javascript.js' %}"></script>
+{% endblock %}

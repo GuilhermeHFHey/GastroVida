@@ -11,11 +11,11 @@
         <tbody>
         {% if db %}
             <tr>
-                <td> {{db.nome}} </td>
-                <td> {{db.idade}} </td>
-                <td> {{db.sexo}} </td>
-                <td> {{db.imc}} </td>
-                <td> {{db.altura}} </td>
+                <td> {{db.nome|default_if_none:""}} </td>
+                <td> {{db.idade|default_if_none:""}} </td>
+                <td> {{db.sexo|default_if_none:""}} </td>
+                <td> {{db.imc|default_if_none:""}} </td>
+                <td> {{db.altura|default_if_none:""}} </td>
             </tr>
         {% endif %}
         {%load static%}
@@ -30,21 +30,15 @@
                 <th scope="col">RCQ</th>
                 <th scope="col">%GC</th>
                 <th scope="col">CX</th>
-                <th scope="col">Data da Cirurgia</th>
-                <th scope="col">Alta</th>
-                <th scope="col">TPO</th>
             </tr>
         </thead>
         <tbody>
         {% if db %}
             <tr>
-                <td> {{db.ca}} </td>
-                <td> {{db.rcq}} </td>
-                <td> {{db.gc}} </td>
-                <td> {{db.cx}} </td>
-                <td> {{db.data}} </td>
-                <td> {{db.alta}} </td>
-                <td> {{db.tpo}} </td>
+                <td> {{db.ca|default_if_none:""}} </td>
+                <td> {{db.rcq|default_if_none:""}} </td>
+                <td> {{db.gc|default_if_none:""}} </td>
+                <td> {{db.cx|default_if_none:""}} </td>
             </tr>
         {% endif %}
         {%load static%}
@@ -52,6 +46,26 @@
         </tbody>
 </table>
 
+<table class="table table-bordered table-hover">
+    <thead class="btn-dark">
+        <tr class="table-success">
+            <th scope="col">Data da Cirurgia</th>
+            <th scope="col">Alta</th>
+            <th scope="col">TPO</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% if db %}
+        <tr>
+            <td> {{db.data|default_if_none:""}} </td>
+            <td> {{db.alta|default_if_none:""}} </td>
+            <td> {{db.tpo|default_if_none:""}} </td>
+        </tr>
+    {% endif %}
+    {%load static%}
+    <script src="{% static 'javascript.js' %}"></script>
+    </tbody>
+</table>
 
 <table class="table table-bordered table-hover">
         <thead class="btn-dark">
@@ -65,10 +79,10 @@
         <tbody>
         {% if db %}
             <tr>
-                <td> {{db.mes1}} </td>
-                <td> {{db.mes3}} </td>
-                <td> {{db.mes6}} </td>
-                <td> {{db.mes9}} </td>
+                <td> {{db.mes1|default_if_none:""}} </td>
+                <td> {{db.mes3|default_if_none:""}} </td>
+                <td> {{db.mes6|default_if_none:""}} </td>
+                <td> {{db.mes9|default_if_none:""}} </td>
             </tr>
         {% endif %}
         {%load static%}
@@ -89,11 +103,11 @@
         <tbody>
         {% if db %}
             <tr>
-                <td> {{db.ano1}} </td>
-                <td> {{db.ano2}} </td>
-                <td> {{db.ano3}} </td>
-                <td> {{db.ano4}} </td>
-                <td> {{db.ano5}} </td>
+                <td> {{db.ano1|default_if_none:""}} </td>
+                <td> {{db.ano2|default_if_none:""}} </td>
+                <td> {{db.ano3|default_if_none:""}} </td>
+                <td> {{db.ano4|default_if_none:""}} </td>
+                <td> {{db.ano5|default_if_none:""}} </td>
             </tr>
         {% endif %}
         {%load static%}
