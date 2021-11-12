@@ -148,3 +148,7 @@ SECURE_SSL_REDIRECT = os.getenv('SECURE_SSL_REDIRECT_ENABLED') != 'False'
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
 SECURE_SSL_REDIRECT = True
+
+# Configure Django App for Heroku.
+import django_heroku
+django_heroku.settings(locals())
