@@ -137,16 +137,9 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = "app.Profissional"
 
-CORS_REPLACE_HTTPS_REFERER      = False
-# HOST_SCHEME                     = "http://"
-SECURE_PROXY_SSL_HEADER         = None
-SECURE_HSTS_SECONDS             = 3600
-SECURE_HSTS_INCLUDE_SUBDOMAINS  = True
-SECURE_FRAME_DENY               = False
-SECURE_HSTS_PRELOAD             = True
-SECURE_SSL_REDIRECT = os.getenv('SECURE_SSL_REDIRECT_ENABLED') != 'False'
-SESSION_COOKIE_SECURE = True
-CSRF_COOKIE_SECURE = True
+SECURE_HSTS_SECONDS = 3600
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+SECURE_HSTS_PRELOAD = True
 SECURE_SSL_REDIRECT = True
 
 # Configure Django App for Heroku.
