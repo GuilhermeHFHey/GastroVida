@@ -165,3 +165,6 @@ SECURE_SSL_REDIRECT = True
 # SECURE_SSL_REDIRECT = False
 # SECURE_PROXY_SSL_HEADER = False
 # CSRF_TRUSTED_ORIGINS = False
+# Configure Django App for Heroku.
+import django_heroku
+django_heroku.settings(locals())
