@@ -129,7 +129,6 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.9/howto/static-files/
@@ -149,8 +148,8 @@ MIDDLEWARE_CLASSES = (
 
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
-import mimetypes
-mimetypes.add_type("text/css", ".css", True)
+import django_heroku
+django_heroku.settings(locals())
 
 
 # Default primary key field type
@@ -176,5 +175,3 @@ SECURE_SSL_REDIRECT = True
 # SECURE_PROXY_SSL_HEADER = False
 # CSRF_TRUSTED_ORIGINS = False
 # Configure Django App for Heroku.
-import django_heroku
-django_heroku.settings(locals())
