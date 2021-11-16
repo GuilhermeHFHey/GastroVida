@@ -44,6 +44,9 @@ INSTALLED_APPS = [
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
+MIDDLEWARE_CLASSES = [
+    'whitenoise.middleware.WhiteNoiseMiddleware',
+]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
