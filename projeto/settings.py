@@ -12,6 +12,9 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 
 import os
 from pathlib import Path
+# Configure Django App for Heroku.
+import django_heroku
+django_heroku.settings(locals())
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -46,14 +49,9 @@ INSTALLED_APPS = [
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
-MIDDLEWARE_CLASSES = (
-    # Simplified static file serving.
-    # https://warehouse.python.org/project/whitenoise/
-    'whitenoise.middleware.WhiteNoiseMiddleware',
-    )
-
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -160,9 +158,6 @@ SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 SECURE_HSTS_PRELOAD = True
 SECURE_SSL_REDIRECT = True
 
-# Configure Django App for Heroku.
-import django_heroku
-django_heroku.settings(locals())
 
 # SECURE_HSTS_INCLUDE_SUBDOMAINS = False
 # SECURE_HSTS_PRELOAD = False
