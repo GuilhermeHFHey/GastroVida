@@ -67,7 +67,7 @@ def registerPage(request):
 
 def initial(request):
     if request.user.is_authenticated:
-        return render(request, 'home.html', data=None)
+        return render(request, 'home.html')
     else:
         return redirect('login')
 
