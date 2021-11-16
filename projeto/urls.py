@@ -18,6 +18,8 @@ from django.contrib import admin
 from django.urls import path
 from django.contrib.auth import views as authViews
 from app.views import home, form, create, view, edit, update, delete, uploadExel, loginPage, registerPage, initial, PrevPred
+from django.conf.urls.static import static
+from django.conf import settings
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -33,4 +35,5 @@ urlpatterns = [
     path('login/', loginPage, name='login'),
     path('register/', registerPage, name='register'),
     path('inicio/', initial, name='initial'),
-]
+] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+
