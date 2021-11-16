@@ -3,6 +3,7 @@ from dateutil.relativedelta import relativedelta
 from django import contrib
 from django.forms.fields import NullBooleanField
 from django.shortcuts import render, redirect
+from scipy.sparse import data
 from app.forms import LoginForm, PacientesForm, RegisterForm, ConsultaForm
 from app.models import Pacientes, Profissional, Consulta
 from django.template.loader import render_to_string
@@ -66,7 +67,7 @@ def registerPage(request):
 
 def initial(request):
     if request.user.is_authenticated:
-        return render(request, 'home.html')
+        return render(request, 'home.html', data=None)
     else:
         return redirect('login')
 
