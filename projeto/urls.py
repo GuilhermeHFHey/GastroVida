@@ -17,7 +17,7 @@ from os import name
 from django.contrib import admin
 from django.urls import path
 from django.contrib.auth import views as authViews
-from app.views import home, form, create, view, edit, update, delete, uploadExel, loginPage, registerPage, initial, PrevPred
+from app.views import home, form, create, view, edit, update, delete, uploadExel, loginPage, registerPage, initial
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -29,7 +29,7 @@ urlpatterns = [
     path('update/<int:pk>/', update, name='update'),
     path('delete/<int:pk>/', delete, name='delete'),
     path('upload/', uploadExel, name='uploadExel'),
-    path('PrevPred/<int:pk>/', PrevPred, name='PrevPred'),
+    # path('PrevPred/<int:pk>/', PrevPred, name='PrevPred'),
     path('login/', loginPage, name='login'),
     path('register/', registerPage, name='register'),
     path('inicio/', initial, name='initial'),
