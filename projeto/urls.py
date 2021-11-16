@@ -17,24 +17,24 @@ from os import name
 from django.contrib import admin
 from django.urls import path
 from django.contrib.auth import views as authViews
-# from app.views import home, form, create, view, edit, update, delete, uploadExel, loginPage, registerPage, initial, PrevPred
+from app.views import home, form, create, view, edit, update, delete, uploadExel, loginPage, registerPage, initial
 from django.conf.urls.static import static
 from django.conf import settings
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    # path('', home, name='home'),
-    # path('form/', form, name='form'),
-    # path('create/', create, name='create'),
-    # path('view/<int:pk>/', view, name='view'),
-    # path('edit/<int:pk>/', edit, name='edit'),
-    # path('update/<int:pk>/', update, name='update'),
-    # path('delete/<int:pk>/', delete, name='delete'),
-    # path('upload/', uploadExel, name='uploadExel'),
+    path('', home, name='home'),
+    path('form/', form, name='form'),
+    path('create/', create, name='create'),
+    path('view/<int:pk>/', view, name='view'),
+    path('edit/<int:pk>/', edit, name='edit'),
+    path('update/<int:pk>/', update, name='update'),
+    path('delete/<int:pk>/', delete, name='delete'),
+    path('upload/', uploadExel, name='uploadExel'),
     # path('PrevPred/<int:pk>/', PrevPred, name='PrevPred'),
-    # path('login/', loginPage, name='login'),
-    # path('register/', registerPage, name='register'),
-    # path('inicio/', initial, name='initial'),
-]  + static(settings.STATIC_URL,document_root=settings.STATICFILES_DIRS[0])
+    path('login/', loginPage, name='login'),
+    path('register/', registerPage, name='register'),
+    path('inicio/', initial, name='initial'),
+] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 
