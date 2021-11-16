@@ -15,7 +15,7 @@
 <body>
     {% block corpo %}
     <div class="col-8 m-auto pt-2 pb-2 text-center">
-        <h1><inS>Cadastro</inS></h1>
+        <h1><inS>Nova Consulta</inS></h1>
     </div>
     
     <div class="col-8 m-auto pt-2 pb-2 text-center">
@@ -30,40 +30,26 @@
     <div class="col-8 m-auto pt-4 pb-2 text-center">
         <div id="result"></div>
 
-        <form name="form" id="form" action="/create/" method="post">
+        <form name="form" id="form" action="/update/{{pk}}/" method="post">
             {% csrf_token %}
             <div style="margin: 20px;" class="form-group row">
-                <div class="form-group col-md-4 mb-0">
-                    {{ form.nome|as_crispy_field }}
+                <div class="form-group col-md-6 mb-0">
+                    {{ form.peso|as_crispy_field }}
                 </div>
-                <div class="form-group col-md-4 mb-0">
-                    {{ form.dataNasc|as_crispy_field }}
-                </div>
-                <div class="form-group col-md-4 mb-0">
-                    {{ form.sexo|as_crispy_field }}
-                </div>
-            </div>
-            <div style="margin: 20px;" class="form-group row">
-                <div class="form-group col-md-4 mb-0">
-                    {{ form.altura|as_crispy_field }}
-                </div>
-                <div class="form-group col-md-4 mb-0">
-                    {{ form.cx|as_crispy_field }}
-                </div>
-                <div class="form-group col-md-4 mb-0">
-                    {{ form.pesoPreOp|as_crispy_field }}
-                </div>
-            </div>
-            <div style="margin: 20px;" class="form-group row">
                 <div class="form-group col-md-6 mb-0">
                     {{ form.data|as_crispy_field }}
                 </div>
-                <div class="form-group col-md-6 mb-0">
-                    {{ form.alta|as_crispy_field }}
-                </div>
             </div>
-            <div style="margin: 20px auto; width: 20%;" class="form-group row">
-                {{ form.proficional|as_crispy_field }}
+            <div style="margin: 20px;" class="form-group row">
+                <div class="form-group col-md-4 mb-0">
+                    {{ form.ca|as_crispy_field }}
+                </div>
+                <div class="form-group col-md-4 mb-0">
+                    {{ form.rcq|as_crispy_field }}
+                </div>
+                <div class="form-group col-md-4 mb-0">
+                    {{ form.gc|as_crispy_field }}
+                </div>
             </div>
             <div style="margin: 20px;">
                 <input type="submit" class="btn btn-success" value="Salvar">
@@ -72,8 +58,10 @@
     </div>
 
     {% load static %}
-    <script src="{% static 'form.js' %}"></script>
+    <script>var pk = "{{ pk }}";</script>
+    <script src="{% static 'consulta.js' %}"></script>
     <script src="{% static 'jquery.mask.min.js' %}"></script>
     {% endblock %}
 </body>
 </html>
+

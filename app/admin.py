@@ -8,7 +8,4 @@ admin.site.register(Profissional, authAdmin.UserAdmin)
 
 @admin.register(Pacientes)
 class PacienteAdmin(ImportExportModelAdmin):
-    list_display = ('nome', 'idade', 'sexo', 'imc', 'altura',
-                    'ca', 'rcq', 'gc', 'cx', 'data', 'alta',
-                    'tpo', 'mes1', 'mes3', 'mes6', 'mes9', 'ano1',
-                    'ano2', 'ano3', 'ano4', 'ano5')
+    list_display = ('nome', 'dataNasc', 'sexo', 'altura','cx', 'data', 'alta', 'pesoPreOp')

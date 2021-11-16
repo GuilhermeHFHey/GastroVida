@@ -1,7 +1,10 @@
+from typing import List
+from dateutil.relativedelta import relativedelta
+from django import contrib
 from django.forms.fields import NullBooleanField
 from django.shortcuts import render, redirect
-from app.forms import LoginForm, PacientesForm, RegisterForm
-from app.models import Pacientes, Profissional
+from app.forms import LoginForm, PacientesForm, RegisterForm, ConsultaForm
+from app.models import Pacientes, Profissional, Consulta
 from django.template.loader import render_to_string
 from django.http import JsonResponse
 from django.contrib import messages
@@ -17,7 +20,14 @@ import matplotlib.pyplot as plt
 import seaborn as sn
 import numpy as np
 from django.contrib.auth import authenticate, login, get_user_model, logout
-
+from Crypto import Random
+from Crypto.Cipher import AES
+from Crypto.Util.Padding import unpad
+import base64
+import ast
+import uuid
+from datetime import date, datetime
+from django.db.models import Max
 # Create your views here.
 
 
@@ -27,15 +37,17 @@ def loginPage(request):
 
     form = LoginForm(request.POST or None)
     data = {"form":form}
-    if request.method == "POST" and form.is_valid():
-        username = form.cleaned_data['username']
-        password = form.cleaned_data['password']
-        user = authenticate(request, username=username, password=password)
+    if request.method == "POST":
+        usuario = request.POST.get('usuario')
+        senha = request.POST.get('senha')
+        usuario = decrypt(usuario, key).decode("utf-8")
+        senha = decrypt(senha, key).decode("utf-8")
+        user = authenticate(request, username=usuario, password=senha)
         if user is not None:
             login(request, user)
-            return redirect("initial")
+            return JsonResponse(data={'message':'Login Valido'}, status=200)
         else:
-            print("login invalido")
+            return JsonResponse(status=404)
     return render(request, 'login.html', data)
 
 
@@ -50,7 +62,7 @@ def registerPage(request):
         prof = form.cleaned_data["prof"]
         newUser = User.objects.create_user(nome=nome, prof=prof, username=username, password=password)
     return render(request, "register.html", data)
-
+ 
 
 def initial(request):
     if request.user.is_authenticated:
@@ -94,16 +106,32 @@ def form(request):
 
 
 def create(request):
-    form = PacientesForm(request.POST or None)
-    if form.is_valid():
-        form.save()
-        return redirect('home')
+    if request.method == "POST":
+        dados = request.POST.get('dados')
+        dados = decrypt(dados, key).decode("utf-8")
+        dados = ast.literal_eval(dados)
+        nome = dados['nome']
+        dataNasc = datetime.strptime(dados['dataNasc'], '%d/%m/%Y').date() if dados['dataNasc'] != '' else datetime.now()
+        sexo = dados['sexo']
+        altura = float(dados['altura']) if dados['altura'] != '' else 0
+        cx = dados['cx']
+        pesoPreOp = float(dados['pesoPreOp']) if dados['pesoPreOp'] != '' else 0
+        data = datetime.strptime(dados['data'], '%d/%m/%Y').date() if dados['data'] != '' else datetime.now()
+        alta = float(dados['alta']) if dados['altura'] != '' else 0
+        proficional = (int(i) for i in dados['proficional'])
+        pac = Pacientes(nome=nome, dataNasc=dataNasc, sexo=sexo, altura=altura, cx=cx,
+         data=data, alta=alta, pesoPreOp=pesoPreOp)
+        pac.save()
+        for p in proficional:
+            pac.proficional.add(p)
+        return JsonResponse(data={'message':'Paciente registrado'}, status=200)
 
 
 def view(request, pk):
     if request.user.is_authenticated:
         data = {}
         data['db'] = Pacientes.objects.get(pk=pk)
+        data['con'] = Consulta.objects.filter(paciente=data['db'])
         return render(request, 'view.html', data)
     else:
         return redirect('login')
@@ -112,20 +140,32 @@ def view(request, pk):
 def edit(request, pk):
     if request.user.is_authenticated:
         data = {}
-        data['db'] = Pacientes.objects.get(pk=pk)
-        data['form'] = PacientesForm(instance=data['db'])
-        return render(request, 'form.html', data)
+        data['pk'] = pk
+        data['form'] = ConsultaForm()
+        return render(request, 'edit.html', data)
     else:
         return redirect('login')
 
 
 def update(request, pk):
-    data = {}
-    data['db'] = Pacientes.objects.get(pk=pk)
-    form = PacientesForm(request.POST or None, instance=data['db'])
-    if form.is_valid():
-        form.save()
-        return redirect('home')
+    if request.method == "POST":
+        dados = request.POST.get('dados')
+        dados = decrypt(dados, key).decode("utf-8")
+        dados = ast.literal_eval(dados)
+        peso = float(dados['peso']) if dados['peso'] != '' else 0
+        ca = float(dados['ca']) if dados['ca'] != '' else 0
+        rcq = float(dados['rcq']) if dados['rcq'] != '' else 0
+        gc = float(dados['gc']) if dados['gc'] != '' else 0
+        data = datetime.strptime(dados['data'], '%d/%m/%Y').date() if dados['data'] != '' else datetime.now()
+        pac = Pacientes.objects.get(pk=pk)
+        numConsulta = ((data - pac.data).days) // 30
+        lastCon = Consulta.objects.filter(paciente=pac, numConsulta=numConsulta)
+        if not lastCon:
+            con = Consulta(numConsulta=numConsulta, peso=peso, ca=ca, rcq=rcq, gc=gc, data=data, paciente=pac)
+            con.save()
+            return JsonResponse(data={'message':'Consulta registrada'}, status=200)
+        else:
+            return JsonResponse(data={'message':'Consulta já registrada nesse periodo'}, status=404)
 
 
 def delete(request, pk):
@@ -141,137 +181,191 @@ def uploadExel(request):
         if not dados.name.endswith('xlsx'):
             messages.info(request, 'Formato Incorreto')
             return render(request, 'import.html')
-
         dadosImportados = dataset.load(dados.read(), format='xlsx')
         for paciente in dadosImportados:
+            if paciente[0] == "CHEGA":
+                break
             value = Pacientes(
-                paciente[0],
-                paciente[0],
-                paciente[1],
-                paciente[2],
-                paciente[3],
-                paciente[4],
-                paciente[5],
-                paciente[6],
-                paciente[7],
-                paciente[8],
-                paciente[9],
-                paciente[10],
-                paciente[11],
-                paciente[12],
-                paciente[13],
-                paciente[14],
-                paciente[15],
-                paciente[16],
-                paciente[17],
-                paciente[18],
-                paciente[19],
-                paciente[20],
+                    nome="",
+                    dataNasc=datetime.now() - relativedelta(years=paciente[1]),
+                    sexo=paciente[2],
+                    altura=float(paciente[4]),
+                    cx=paciente[8],
+                    data=paciente[9],
+                    alta=float(paciente[10]) if paciente[10] is not None else 0,
+                    pesoPreOp=float(paciente[0]),
             )
             p = Profissional.objects.get(pk=1)
             value.save()
             value.proficional.add(p)
+            if paciente[12] != None:
+                consulta = Consulta(
+                        numConsulta=1,
+                        peso=paciente[0]-(value.getExcesso()*paciente[12]),
+                        ca=float(paciente[5]) if paciente[5] is not None else 0,
+                        rcq=float(paciente[6]) if paciente[6] is not None else 0,
+                        gc=float(paciente[7]) if paciente[7] is not None else 0,
+                        data=paciente[9] + relativedelta(months=1),
+                        paciente=value
+                )
+                consulta.save()
+            if paciente[13] != None:
+                consulta = Consulta(
+                        numConsulta=2,
+                        peso=paciente[0]-(value.getExcesso()*paciente[13]),
+                        ca=float(paciente[5]) if paciente[5] is not None else 0,
+                        rcq=float(paciente[6]) if paciente[6] is not None else 0,
+                        gc=float(paciente[7]) if paciente[7] is not None else 0,
+                        data=paciente[9] + relativedelta(months=3),
+                        paciente=value
+                )
+                consulta.save()
+            if paciente[14] != None:
+                consulta = Consulta(
+                        numConsulta=3,
+                        peso=paciente[0]-(value.getExcesso()*paciente[14]),
+                        ca=float(paciente[5]) if paciente[5] is not None else 0,
+                        rcq=float(paciente[6]) if paciente[6] is not None else 0,
+                        gc=float(paciente[7]) if paciente[7] is not None else 0,
+                        data=paciente[9] + relativedelta(months=6),
+                        paciente=value
+                )
+                consulta.save()
+            if paciente[15] != None:
+                consulta = Consulta(
+                        numConsulta=4,
+                        peso=paciente[0]-(value.getExcesso()*paciente[15]),
+                        ca=float(paciente[5]) if paciente[5] is not None else 0,
+                        rcq=float(paciente[6]) if paciente[6] is not None else 0,
+                        gc=float(paciente[7]) if paciente[7] is not None else 0,
+                        data=paciente[9] + relativedelta(months=9),
+                        paciente=value
+                )
+                consulta.save()
+            if paciente[16] != None:
+                consulta = Consulta(
+                        numConsulta=5,
+                        peso=paciente[0]-(value.getExcesso()*paciente[16]),
+                        ca=float(paciente[5]) if paciente[5] is not None else 0,
+                        rcq=float(paciente[6]) if paciente[6] is not None else 0,
+                        gc=float(paciente[7]) if paciente[7] is not None else 0,
+                        data=paciente[9] + relativedelta(years=1),
+                        paciente=value
+                )
+                consulta.save()
+            if paciente[17] != None:
+                consulta = Consulta(
+                        numConsulta=6,
+                        peso=paciente[0]-(value.getExcesso()*paciente[17]),
+                        ca=float(paciente[5]) if paciente[5] is not None else 0,
+                        rcq=float(paciente[6]) if paciente[6] is not None else 0,
+                        gc=float(paciente[7]) if paciente[7] is not None else 0,
+                        data=paciente[9] + relativedelta(years=2),
+                        paciente=value
+                )
+                consulta.save()
+            if paciente[18] != None:
+                consulta = Consulta(
+                        numConsulta=7,
+                        peso=paciente[0]-(value.getExcesso()*paciente[18]),
+                        ca=float(paciente[5]) if paciente[5] is not None else 0,
+                        rcq=float(paciente[6]) if paciente[6] is not None else 0,
+                        gc=float(paciente[7]) if paciente[7] is not None else 0,
+                        data=paciente[9] + relativedelta(years=3),
+                        paciente=value
+                )
+                consulta.save()
+            if paciente[19] != None:
+                consulta = Consulta(
+                        numConsulta=8,
+                        peso=paciente[0]-(value.getExcesso()*paciente[19]),
+                        ca=float(paciente[5]) if paciente[5] is not None else 0,
+                        rcq=float(paciente[6]) if paciente[6] is not None else 0,
+                        gc=float(paciente[7]) if paciente[7] is not None else 0,
+                        data=paciente[9] + relativedelta(years=4),
+                        paciente=value
+                )
+                consulta.save()
+            if paciente[20] != None:
+                consulta = Consulta(
+                        numConsulta=9,
+                        peso=paciente[0]-(value.getExcesso()*paciente[20]),
+                        ca=float(paciente[5]) if paciente[5] is not None else 0,
+                        rcq=float(paciente[6]) if paciente[6] is not None else 0,
+                        gc=float(paciente[7]) if paciente[7] is not None else 0,
+                        data=paciente[9] + relativedelta(years=5),
+                        paciente=value
+                )
+                consulta.save()
+
 
     return render(request, 'import.html')
 
-"""
+def getNumConsulta(data1, data2):
+    numConsuta =(data1 - data2).days // 30
+    if numConsuta == 1: return 1
+    elif numConsuta == 3: return 2
+    elif numConsuta == 6: return 3
+    elif numConsuta == 9: return 4
+    elif numConsuta == 12: return 5
+    elif numConsuta == 24: return 6
+    elif numConsuta == 36: return 7
+    elif numConsuta == 48: return 8
+    else: return 9
+
+
 def dataFrame():
-    df = pd.DataFrame(list(Pacientes.objects.all().values()))
+    d = {'pacienteId': Pacientes.objects.values_list("id", flat=True)}
+    df = pd.DataFrame(data=d)
     if df is not None:
-        df["mes1"].fillna(-1, inplace=True)
-        df["mes3"].fillna(-1, inplace=True)
-        df["mes6"].fillna(-1, inplace=True)
-        df["mes9"].fillna(-1, inplace=True)
-        df["ano1"].fillna(-1, inplace=True)
-        df["ano2"].fillna(-1, inplace=True)
-        df["ano3"].fillna(-1, inplace=True)
-        df["ano4"].fillna(-1, inplace=True)
-        df["ano5"].fillna(-1, inplace=True)
-        Abandonos = []
-        ProximasConsultas = []
-        pdps1 = []
-        pdps2 = []
-        pdps3 = []
-        pdps4 = []
+        abandonos = []
+        ultimaCon = []
+        Cons = np.zeros((len(df.index), 10))
+        ConsMenosUlt = np.zeros((len(df.index), 9))
         for index, row in df.iterrows():
-            pdp1 = 0.25
-            pdp2 = 0.45
-            pdp3 = 0.64
-            pdp4 = 0.75
-            if row["mes1"] != -1:
-                pdp1 = row["mes1"]
-            if row["mes3"] != -1:
-                pdp2 = row["mes3"]
-            if row["mes6"] != -1:
-                pdp3 = row["mes6"]
-            if row["mes9"] != -1:
-                pdp4 = row["mes9"]
+            pac = Pacientes.objects.get(pk=row["pacienteId"])
+            consultas = Consulta.objects.filter(paciente=pac)
+            Cons[index][0] = ((date.today() - pac.data).days)
+            if not consultas:
+                if getNumConsulta(date.today(), pac.data) > 2:
+                    abandonos.append(True)
+                else:
+                    abandonos.append(False)
+                ultimaCon.append(0)
+                continue
 
-            abandono = False
-            proximaConsulta = ""
-            consultaAtual = row["tpo"]/365
-            if consultaAtual <= 0.07:
-                proximaConsulta = "mes1"
-            elif 0.07 < consultaAtual <= 0.25:
-                proximaConsulta = "mes3"
-            elif 0.25 < consultaAtual <= 0.5:
-                proximaConsulta = "mes6"
-                if row["mes3"] == -1 and row["mes1"] == -1:
-                    abandono = True
-            elif 0.5 < consultaAtual <= 0.75:
-                proximaConsulta = "mes9"
-                if row["mes6"] == -1 and row["mes3"] == -1:
-                    abandono = True
-            elif 0.75 < consultaAtual <= 1:
-                proximaConsulta = "ano1"
-                if row["mes9"] == -1 and row["mes6"] == -1:
-                    abandono = True
-            elif 1 < consultaAtual <= 2:
-                proximaConsulta = "ano2"
-                if row["ano1"] == -1 and row["mes9"] == -1:
-                    abandono = True
-            elif 2 < consultaAtual <= 3:
-                proximaConsulta = "ano3"
-                if row["ano1"] == -1 and row["ano2"] == -1:
-                    abandono = True
-            elif 3 < consultaAtual <= 4:
-                proximaConsulta = "ano4"
-                if row["ano3"] == -1 and row["ano2"] == -1:
-                    abandono = True
-            elif 4 < consultaAtual <= 5:
-                proximaConsulta = "ano5"
-                if row["ano4"] == -1 and row["ano3"] == -1:
-                    abandono = True
+            ultima = consultas.last()
+            numConsultaHoje = getNumConsulta(date.today(), ultima.data)
+            consultasMenosUlt = consultas.exclude(numConsulta=ultima.numConsulta)
+
+            if (numConsultaHoje - ultima.numConsulta) > 2:
+                abandonos.append(True)
             else:
-                if row["ano5"] == -1 and row["ano4"] == -1:
-                    abandono = True
-            pdps1.append(pdp1)
-            pdps2.append(pdp2)
-            pdps3.append(pdp3)
-            pdps4.append(pdp4)
-            Abandonos.append(abandono)
-            ProximasConsultas.append(proximaConsulta)
+                abandonos.append(False)
 
-        df["Abandono"] = Abandonos
-        df["ProximaConsulta"] = ProximasConsultas
-        df["PDP1"] = pdps1
-        df["PDP2"] = pdps2
-        df["PDP3"] = pdps3
-        df["PDP4"] = pdps4
+            for con in consultas:
+                Cons[index][int(con.numConsulta)] = float(con.peso)
+
+            for con in consultasMenosUlt:
+                ConsMenosUlt[index][int(con.numConsulta)-1] = con.peso
+
+            ultimaCon.append(ultima.peso)
+
+        df["abandono"] = abandonos
+        df["consultas"] = Cons.tolist()
+        df["consultasMenosultima"] = ConsMenosUlt.tolist()
+        df["ultimaCon"] = ultimaCon
 
         return df
     else:
         return None
 
-
 df = dataFrame()
-
 
 def ClassificadorLOO():
     global df
-    X = df[["tpo", "mes1", "mes3", "mes6", "mes9",
-            "ano1", "ano2", "ano3", "ano4", "ano5"]]
-    y = df["Abandono"]
+    X = np.stack(df["consultas"], axis=0)
+    y = df["abandono"]
     # y_true, y_pred, probs = [], [], []
 
     # cv = LeaveOneOut()
@@ -306,22 +400,22 @@ def ClassificadorLOO():
 
     rus = RandomUnderSampler()
     X, y = rus.fit_resample(X, y)
-    y_true, y_pred, probs = [], [], []
+    # y_true, y_pred, probs = [], [], []
 
-    cv = LeaveOneOut()
-    for train_index, test_index in cv.split(X):
-        X_train, X_test = X.iloc[train_index], X.iloc[test_index]
-        y_train, y_test = y[train_index], y[test_index]
-        rf = RandomForestClassifier()
-        rf.fit(X_train, y_train)
-        y_true.append(y_test)
-        y_pred.append(rf.predict(X_test)[0])
-        probs.append(rf.predict_proba(X_test)[:, 1])
+    # cv = LeaveOneOut()
+    # for train_index, test_index in cv.split(X):
+    #     X_train, X_test = X.iloc[train_index], X.iloc[test_index]
+    #     y_train, y_test = y[train_index], y[test_index]
+    #     rf = RandomForestClassifier()
+    #     rf.fit(X_train, y_train)
+    #     y_true.append(y_test)
+    #     y_pred.append(rf.predict(X_test)[0])
+    #     probs.append(rf.predict_proba(X_test)[:, 1])
 
-    acc = accuracy_score(y_true, y_pred)
-    pre = precision_score(y_true, y_pred)
-    f1 = f1_score(y_true, y_pred)
-    auc = roc_auc_score(y_true, probs)
+    # acc = accuracy_score(y_true, y_pred)
+    # pre = precision_score(y_true, y_pred)
+    # f1 = f1_score(y_true, y_pred)
+    # auc = roc_auc_score(y_true, probs)
     # print("="*30)
     # print("Testes com base balanceada")
     # print("Acuracia: ", acc)
@@ -334,11 +428,11 @@ def ClassificadorLOO():
 
     # fper, tper, thresholds = roc_curve(y, probs)
     # plot_roc_curve(fper, tper)
-
     rf = RandomForestClassifier()
     rf.fit(X, y)
-    return rf, acc, pre, f1, auc
-"""
+    # ,acc, pre, f1, auc
+    return rf
+
 """
 def ClassificadorKF():
     global df
@@ -434,25 +528,25 @@ def plot_roc_curve(fper, tper):
     plt.legend()
     plt.savefig("ROC.png")
 """
-"""
+
 def Regressor():
     global df
-    X = df[["PDP1", "PDP2", "PDP3"]]
-    y = df["PDP4"]
-    y_true, y_pred = [], []
+    X = np.stack(df["consultasMenosultima"], axis=0)
+    y = df["ultimaCon"]
+    # y_true, y_pred = [], []
 
-    cv = LeaveOneOut()
-    for train_index, test_index in cv.split(X):
-        X_train, X_test = X.iloc[train_index], X.iloc[test_index]
-        y_train, y_test = y[train_index], y[test_index]
-        lr = LinearRegression()
-        lr.fit(X_train, y_train)
-        y_true.append(y_test)
-        y_pred.append(lr.predict(X_test)[0])
+    # cv = LeaveOneOut()
+    # for train_index, test_index in cv.split(X):
+    #     X_train, X_test = X.iloc[train_index], X.iloc[test_index]
+    #     y_train, y_test = y[train_index], y[test_index]
+    #     lr = LinearRegression()
+    #     lr.fit(X_train, y_train)
+    #     y_true.append(y_test)
+    #     y_pred.append(lr.predict(X_test)[0])
 
-    mae = mean_absolute_error(y_true, y_pred)
-    mse = mean_squared_error(y_true, y_pred, squared=True)
-    rmse = mean_squared_error(y_true, y_pred, squared=False)
+    # mae = mean_absolute_error(y_true, y_pred)
+    # mse = mean_squared_error(y_true, y_pred, squared=True)
+    # rmse = mean_squared_error(y_true, y_pred, squared=False)
     # print("="*30)
     # print("LOO")
     # print(mae)
@@ -482,13 +576,13 @@ def Regressor():
 
     lr = LinearRegression()
     lr.fit(X, y)
+    # , mae, mse, rmse
+    return lr
 
-    return lr, mae, mse, rmse
-
-rf, acc, pre, f1, auc = ClassificadorLOO()
-# ClassificadorKF()
+rf = ClassificadorLOO()
 print("Classificador Pronto")
-lr, mae, mse, rmse = Regressor()
+
+lr = Regressor()
 print("Regressor Pronto")
 # acc = round(acc, 2)*100
 # pre = round(acc, 2)*100
@@ -498,53 +592,35 @@ print("Regressor Pronto")
 
 def PrevPred(request, pk):
     global rf, lr
-    df = pd.DataFrame(list(Pacientes.objects.all().values()))
-    df["mes1"].fillna(-1, inplace=True)
-    df["mes3"].fillna(-1, inplace=True)
-    df["mes6"].fillna(-1, inplace=True)
-    df["mes9"].fillna(-1, inplace=True)
-    df["ano1"].fillna(-1, inplace=True)
-    df["ano2"].fillna(-1, inplace=True)
-    df["ano3"].fillna(-1, inplace=True)
-    df["ano4"].fillna(-1, inplace=True)
-    df["ano5"].fillna(-1, inplace=True)
-    paciente = df.loc[df["id"] == pk]
-    paciente = paciente[["tpo", "mes1", "mes3", "mes6", "mes9",
-                         "ano1", "ano2", "ano3", "ano4", "ano5"]]
-    prob = rf.predict_proba(paciente)
-    pdp1 = 0.25
-    pdp2 = 0.45
-    pdp3 = 0.64
-    try:
-        pdp1 = paciente["mes1"].values[0] if paciente["mes1"].values[0] != -1 else 0.25
-    except Exception:
-        pass
-    try:
-        pdp2 = paciente["mes3"].values[0] if paciente["mes3"].values[0] != -1 else 0.45
-    except Exception:
-        pass
-    try:
-        pdp3 = paciente["mes6"].values[0] if paciente["mes6"].values[0] != -1 else 0.64
-    except Exception:
-        pass
-    paciente["PDP1"] = pdp1
-    paciente["PDP2"] = pdp2
-    paciente["PDP3"] = pdp3
-    paciente = paciente[["PDP1", "PDP2", "PDP3"]]
-    pdp4 = lr.predict(paciente)[0]
+    pac = Pacientes.objects.get(pk=pk)
+    cons = Consulta.objects.filter(paciente=pac)
+    consultas = np.zeros(10)
+    consultasSemData = np.zeros(9)
+    perdaPerc = np.zeros(9)
+    consultas[0] = ((date.today() - pac.data).days)
+    ult = 0
+    for c in cons:
+        consultas[int(c.numConsulta)] = c.peso
+        consultasSemData[int(c.numConsulta)-1] = c.peso
+        perdaPerc[int(c.numConsulta)-1] = c.getPerdaPerc()
+        ult = int(c.numConsulta)
+    
+    prob = rf.predict_proba(consultas[np.newaxis, :])
+    pdp = lr.predict(consultasSemData[np.newaxis, :])[0]
+    perdaPerc[ult:] = pdp
     lines = pd.DataFrame({
-        'Média':[0.25, 0.45, 0.64, 0.75],
-        'Paciente Previsto':[pdp1, pdp2, pdp3, pdp4],
-    }, index=['Mês1', 'Mês3', 'Mês6', 'Mês9'])
+        'Média':[25, 45, 64, 75, 80, 84, 84, 76, 0],
+        'Paciente Previsto':perdaPerc,
+    }, index=['Mês 1', 'Mês 3', 'Mês 6', 'Mês 9', 'Ano 1', 'Ano 2', 'Ano 3', 'Ano 4', 'Ano 5'])
     plt.figure()
     lines.plot.line()
     plt.savefig("./app/static/images/grafico.png")
 
     data = {}
     data['db'] = {}
-    data['db'] = ({'prob': round(prob[0][1], 2)*100, 'pdp4': round(pdp4, 2)*100, 'id': pk})
+    data['db'] = ({'prob': round(prob[0][1], 2)*100, 'pdp4': round(100 * (pdp/pac.getExcesso()), 2), 'id': pk})
     return render(request, 'prevPred.html', data)
-"""
+
 """
 def Prediçao(request, pk):
     global rf, acc, pre, f1, auc
@@ -606,3 +682,22 @@ def Previsao(request, pk):
 
     return render(request, 'previsao.html', data)
 """
+
+BLOCK_SIZE = 16
+key = b"1234567890123456"
+
+def pad(data):
+    length = BLOCK_SIZE - (len(data) % BLOCK_SIZE)
+    return data + chr(length)*length
+
+
+def encrypt(message, key):
+    IV = Random.new().read(BLOCK_SIZE)
+    aes = AES.new(key, AES.MODE_CBC, IV)
+    return base64.b64encode(IV + aes.encrypt(pad(message)))
+
+def decrypt(encrypted, key):
+    encrypted = base64.b64decode(encrypted)
+    IV = encrypted[:BLOCK_SIZE]
+    aes = AES.new(key, AES.MODE_CBC, IV)
+    return unpad(aes.decrypt(encrypted[BLOCK_SIZE:]), BLOCK_SIZE)

@@ -1,9 +1,10 @@
 from django.db import models
 from django.forms.fields import ChoiceField
 from django.contrib.auth.models import AbstractUser
-from django_cryptography.fields import encrypt
-
-
+from django_cryptography.fields import encrypt, get_encrypted_field
+from numpy import mod
+from datetime import date, datetime
+from dateutil.relativedelta import relativedelta
 # # Create your models here.
 
 
@@ -16,32 +17,51 @@ class Pacientes(models.Model):
         ('M', 'Masculino'),
         ('F', 'Feminino'),
     )
-    nome = encrypt(models.CharField(max_length=150, blank=True, null=True))
-    idade = encrypt(models.DecimalField(blank=True, null=True, decimal_places=0, max_digits=3))
-    sexo = encrypt(models.CharField(blank=True, null=True, max_length=1, choices=SEXO))
-    imc = encrypt(models.FloatField(blank=True, null=True, max_length=4))
-    altura = encrypt(models.FloatField(blank=True, null=True,
-                               max_length=30))
-    ca = encrypt(models.DecimalField(blank=True, null=True, decimal_places=0, max_digits=3))  # circunferencia abdominal
-    rcq = encrypt(models.DecimalField(blank=True, null=True, decimal_places=0, max_digits=3))  # relacao cintura quadril
-    gc = encrypt(models.FloatField(blank=True, null=True, max_length=5))
-    cx = encrypt(models.CharField(blank=True, null=True, max_length=100))
-    data = encrypt(models.DateField(blank=True, null=True))
-    alta = encrypt(models.DecimalField(blank=True, null=True, decimal_places=0, max_digits=3))
-    tpo = encrypt(models.DecimalField(blank=True, null=True, decimal_places=0, max_digits=3))
-    mes1 = encrypt(models.FloatField(max_length=4, blank=True, null=True))
-    mes3 = encrypt(models.FloatField(max_length=4, blank=True, null=True))
-    mes6 = encrypt(models.FloatField(max_length=4, blank=True, null=True))
-    mes9 = encrypt(models.FloatField(max_length=4, blank=True, null=True))
-    ano1 = encrypt(models.FloatField(max_length=4, blank=True, null=True))
-    ano2 = encrypt(models.FloatField(max_length=4, blank=True, null=True))
-    ano3 = encrypt(models.FloatField(max_length=4, blank=True, null=True))
-    ano4 = encrypt(models.FloatField(max_length=4, blank=True, null=True))
-    ano5 = encrypt(models.FloatField(max_length=4, blank=True, null=True))
+    id = models.BigAutoField(primary_key=True)
+    nome = encrypt(models.CharField(max_length=150, default=''))
+    dataNasc = models.DateField(default='')
+    sexo = encrypt(models.CharField(max_length=1, choices=SEXO, default=''))
+    altura = encrypt(models.FloatField(max_length=30, default=''))
+    cx = encrypt(models.CharField(max_length=100, default=''))
+    data = encrypt(models.DateField(default=''))
+    alta = models.DecimalField(decimal_places=0, max_digits=3, default='')
+    pesoPreOp = models.FloatField(default='')
     proficional = models.ManyToManyField(Profissional)
 
-    # peso = models.FloatField(max_length=30, blank=True)
-    # pesoPreOperatorio = models.FloatField(
-    #     max_length=30, blank=True)  # nao tem na lista do excel,
-    # fumo = models.BooleanField(blank=True)  # nao tem na lista do excel,
-    # perguntar se esta vai ser a relacao de tempo entre cada consulta mesmo
+    def getIdade(self):
+        return relativedelta(date.today(), self.dataNasc).years
+
+    def getIMC(self):
+        return round(self.pesoPreOp/(self.altura*self.altura), 2)
+
+    def getPesoIdeal(self):
+        if self.sexo == 'M':
+            return round(61.2328 + ((self.altura - 1.524)*53.5433), 2)
+        else:
+            return round(53.975 + ((self.altura - 1.524)*53.5433), 2)
+
+    def getExcesso(self):
+        return round(self.pesoPreOp - self.getPesoIdeal(), 2)
+
+
+class Consulta(models.Model):
+    id = models.BigAutoField(primary_key=True)
+    numConsulta = models.FloatField(default='')
+    peso = models.FloatField(default='',  max_length=5)
+    ca = encrypt(models.DecimalField(default='',  decimal_places=0, max_digits=3))  # circunferencia abdominal
+    rcq = encrypt(models.DecimalField(default='', decimal_places=0, max_digits=3))  # relacao cintura quadril
+    gc = encrypt(models.FloatField(default='', max_length=5))
+    data = encrypt(models.DateField(default=''))
+    paciente = models.ForeignKey(Pacientes, on_delete=models.CASCADE)
+
+    def getIMC(self):
+        return round(self.peso/(self.paciente.altura*self.paciente.altura), 2)
+
+    def getPerda(self):
+        return round(self.paciente.pesoPreOp - self.peso, 2)
+
+    def getPerdaPerc(self):
+        return round(100 * (self.getPerda()/self.paciente.getExcesso()), 2)
+
+
+    

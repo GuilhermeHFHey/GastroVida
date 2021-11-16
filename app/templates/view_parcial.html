@@ -4,7 +4,7 @@
                 <th scope="col">Nome</th>
                 <th scope="col">Idade</th>
                 <th scope="col">Sexo</th>
-                <th scope="col">IMC</th>
+                <th scope="col">Data Nascimento</th>
                 <th scope="col">Altura</th>
             </tr>
         </thead>
@@ -12,9 +12,9 @@
         {% if db %}
             <tr>
                 <td> {{db.nome|default_if_none:""}} </td>
-                <td> {{db.idade|default_if_none:""}} </td>
+                <td> {{db.getIdade|default_if_none:""}} </td>
                 <td> {{db.sexo|default_if_none:""}} </td>
-                <td> {{db.imc|default_if_none:""}} </td>
+                <td> {{db.dataNasc|default_if_none:""}} </td>
                 <td> {{db.altura|default_if_none:""}} </td>
             </tr>
         {% endif %}
@@ -26,91 +26,81 @@
 <table class="table table-bordered table-hover">
         <thead class="btn-dark">
             <tr class="table-success">
-                <th scope="col">CA</th>
-                <th scope="col">RCQ</th>
-                <th scope="col">%GC</th>
+                <th scope="col">Data Cirurgia</th>
+                <th scope="col">Alta</th>
+                <th scope="col">Peso Pré-Operatório</th>
                 <th scope="col">CX</th>
+                <th scope="col">IMC</th>
+                <th scope="col">Peso Ideal</th>
+                <th scope="col">Excesso de Peso</th>
             </tr>
         </thead>
         <tbody>
         {% if db %}
             <tr>
-                <td> {{db.ca|default_if_none:""}} </td>
-                <td> {{db.rcq|default_if_none:""}} </td>
-                <td> {{db.gc|default_if_none:""}} </td>
+                <td> {{db.data|default_if_none:""}} </td>
+                <td> {{db.alta|default_if_none:""}} </td>
+                <td> {{db.pesoPreOp|default_if_none:""}} </td>
                 <td> {{db.cx|default_if_none:""}} </td>
+                <td> {{db.getIMC|default_if_none:""}} </td>
+                <td> {{db.getPesoIdeal|default_if_none:""}} </td>
+                <td> {{db.getExcesso|default_if_none:""}} </td>
             </tr>
         {% endif %}
         {%load static%}
         <script src="{% static 'javascript.js' %}"></script>
         </tbody>
 </table>
+{% if con %}
+<div class="col-8 m-auto pt-2 pb-2 text-center">
+    <h1><inS>Consultas</inS></h1>
+</div>
 
+{% for c in con %}
 <table class="table table-bordered table-hover">
     <thead class="btn-dark">
         <tr class="table-success">
-            <th scope="col">Data da Cirurgia</th>
-            <th scope="col">Alta</th>
-            <th scope="col">TPO</th>
+            <th scope="col">Peso na Consulta</th>
+            <th scope="col">Circunferência Abdominal</th>
+            <th scope="col">Relação Cintura Quadril</th>
+            <th scope="col">Gordura Corporal</th>
+            <th scope="col">Data da Consulta</th>
         </tr>
     </thead>
     <tbody>
     {% if db %}
         <tr>
-            <td> {{db.data|default_if_none:""}} </td>
-            <td> {{db.alta|default_if_none:""}} </td>
-            <td> {{db.tpo|default_if_none:""}} </td>
+            <td> {{c.peso|default_if_none:""}} </td>
+            <td> {{c.ca|default_if_none:""}} </td>
+            <td> {{c.rcq|default_if_none:""}} </td>
+            <td> {{c.gc|default_if_none:""}} </td>
+            <td> {{c.data|default_if_none:""}} </td>
         </tr>
     {% endif %}
     {%load static%}
     <script src="{% static 'javascript.js' %}"></script>
     </tbody>
 </table>
-
 <table class="table table-bordered table-hover">
-        <thead class="btn-dark">
-            <tr class="table-success">
-                <th scope="col">Mês 1:</th>
-                <th scope="col">Mês 3:</th>
-                <th scope="col">Mês 6:</th>
-                <th scope="col">Mês 9:</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% if db %}
-            <tr>
-                <td> {{db.mes1|default_if_none:""}} </td>
-                <td> {{db.mes3|default_if_none:""}} </td>
-                <td> {{db.mes6|default_if_none:""}} </td>
-                <td> {{db.mes9|default_if_none:""}} </td>
-            </tr>
-        {% endif %}
-        {%load static%}
-        <script src="{% static 'javascript.js' %}"></script>
-        </tbody>
+    <thead class="btn-dark">
+        <tr class="table-success">
+            <th scope="col">IMC</th>
+            <th scope="col">Perda de Peso</th>
+            <th scope="col">Perda de Peso (%)</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% if db %}
+        <tr>
+            <td> {{c.getIMC|default_if_none:""}} </td>
+            <td> {{c.getPerda|default_if_none:""}} </td>
+            <td> {{c.getPerdaPerc|default_if_none:""}} </td>
+        </tr>
+    {% endif %}
+    {%load static%}
+    <script src="{% static 'javascript.js' %}"></script>
+    </tbody>
 </table>
-
-<table class="table table-bordered table-hover">
-        <thead class="btn-dark">
-            <tr class="table-success">
-                <th scope="col">Ano 1:</th>
-                <th scope="col">Ano 2:</th>
-                <th scope="col">Ano 3:</th>
-                <th scope="col">Ano 4:</th>
-                <th scope="col">Ano 5:</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% if db %}
-            <tr>
-                <td> {{db.ano1|default_if_none:""}} </td>
-                <td> {{db.ano2|default_if_none:""}} </td>
-                <td> {{db.ano3|default_if_none:""}} </td>
-                <td> {{db.ano4|default_if_none:""}} </td>
-                <td> {{db.ano5|default_if_none:""}} </td>
-            </tr>
-        {% endif %}
-        {%load static%}
-        <script src="{% static 'javascript.js' %}"></script>
-        </tbody>
-</table>
+<hr />
+{% endfor %}
+{% endif %}
