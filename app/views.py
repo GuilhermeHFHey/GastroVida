@@ -615,7 +615,7 @@ def PrevPred(request, pk):
     }, index=['Mês 1', 'Mês 3', 'Mês 6', 'Mês 9', 'Ano 1', 'Ano 2', 'Ano 3', 'Ano 4', 'Ano 5'])
     plt.figure()
     lines.plot.line()
-    plt.savefig("./staticfiles/images/grafico.png")
+    plt.savefig("./static/images/grafico.png")
 
     data = {}
     data['db'] = {}
