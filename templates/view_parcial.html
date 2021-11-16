@@ -1,0 +1,106 @@
+<table class="table table-bordered table-hover">
+        <thead class="btn-dark">
+            <tr class="table-success">
+                <th scope="col">Nome</th>
+                <th scope="col">Idade</th>
+                <th scope="col">Sexo</th>
+                <th scope="col">Data Nascimento</th>
+                <th scope="col">Altura</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% if db %}
+            <tr>
+                <td> {{db.nome|default_if_none:""}} </td>
+                <td> {{db.getIdade|default_if_none:""}} </td>
+                <td> {{db.sexo|default_if_none:""}} </td>
+                <td> {{db.dataNasc|default_if_none:""}} </td>
+                <td> {{db.altura|default_if_none:""}} </td>
+            </tr>
+        {% endif %}
+        {%load static%}
+        <script src="{% static 'javascript.js' %}"></script>
+        </tbody>
+</table>
+
+<table class="table table-bordered table-hover">
+        <thead class="btn-dark">
+            <tr class="table-success">
+                <th scope="col">Data Cirurgia</th>
+                <th scope="col">Alta</th>
+                <th scope="col">Peso Pré-Operatório</th>
+                <th scope="col">CX</th>
+                <th scope="col">IMC</th>
+                <th scope="col">Peso Ideal</th>
+                <th scope="col">Excesso de Peso</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% if db %}
+            <tr>
+                <td> {{db.data|default_if_none:""}} </td>
+                <td> {{db.alta|default_if_none:""}} </td>
+                <td> {{db.pesoPreOp|default_if_none:""}} </td>
+                <td> {{db.cx|default_if_none:""}} </td>
+                <td> {{db.getIMC|default_if_none:""}} </td>
+                <td> {{db.getPesoIdeal|default_if_none:""}} </td>
+                <td> {{db.getExcesso|default_if_none:""}} </td>
+            </tr>
+        {% endif %}
+        {%load static%}
+        <script src="{% static 'javascript.js' %}"></script>
+        </tbody>
+</table>
+{% if con %}
+<div class="col-8 m-auto pt-2 pb-2 text-center">
+    <h1><inS>Consultas</inS></h1>
+</div>
+
+{% for c in con %}
+<table class="table table-bordered table-hover">
+    <thead class="btn-dark">
+        <tr class="table-success">
+            <th scope="col">Peso na Consulta</th>
+            <th scope="col">Circunferência Abdominal</th>
+            <th scope="col">Relação Cintura Quadril</th>
+            <th scope="col">Gordura Corporal</th>
+            <th scope="col">Data da Consulta</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% if db %}
+        <tr>
+            <td> {{c.peso|default_if_none:""}} </td>
+            <td> {{c.ca|default_if_none:""}} </td>
+            <td> {{c.rcq|default_if_none:""}} </td>
+            <td> {{c.gc|default_if_none:""}} </td>
+            <td> {{c.data|default_if_none:""}} </td>
+        </tr>
+    {% endif %}
+    {%load static%}
+    <script src="{% static 'javascript.js' %}"></script>
+    </tbody>
+</table>
+<table class="table table-bordered table-hover">
+    <thead class="btn-dark">
+        <tr class="table-success">
+            <th scope="col">IMC</th>
+            <th scope="col">Perda de Peso</th>
+            <th scope="col">Perda de Peso (%)</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% if db %}
+        <tr>
+            <td> {{c.getIMC|default_if_none:""}} </td>
+            <td> {{c.getPerda|default_if_none:""}} </td>
+            <td> {{c.getPerdaPerc|default_if_none:""}} </td>
+        </tr>
+    {% endif %}
+    {%load static%}
+    <script src="{% static 'javascript.js' %}"></script>
+    </tbody>
+</table>
+<hr />
+{% endfor %}
+{% endif %}

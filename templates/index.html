@@ -1,0 +1,40 @@
+{% extends 'modelo.html' %}
+
+    {% block head%}
+    <meta charset="UTF-8">
+    <title>Pacientes</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    {% endblock %}
+
+    {% block corpo %}
+<div style="margin-top: 20px;" class="container-fluid">
+    <div class="col-8 m-auto pt-2 pb-2 text-center">
+        <h1><inS>Pacientes</inS></h1>
+    </div>
+    
+
+    <div class="col-8 m-auto pt-2 pb-2 text-center">
+        <input type="text" id="search" name="search" class="form-control" placeholder="Buscar...">
+    </div>
+    
+    <div id="replaceable-content" class="col-8 m-auto pt-2 pb-2 text-center table-responsive">
+        {% include 'index_partial.html' %}
+    </div>
+
+    <ul class="pagination justify-content-center">
+        {% if db.has_previous %}
+            <a href="?page={{db.previous_page_number}}" class="page-link"><</a>
+        {% endif %}
+
+        <li class="page-item disabled">
+            <a class="page-link" href="#" tabindex="-1">{{db.number}}</a>
+        </li>
+
+        {% if db.has_next %}
+            <a href="?page={{db.next_page_number}}" class="page-link">></a>
+        {% endif %}
+    </ul>
+</div>
+{%load static%}
+<script src="{% static 'javascript.js' %}"></script>
+{% endblock %}

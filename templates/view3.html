@@ -1,0 +1,57 @@
+{% extends 'modelo.html' %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    {% block head%}
+    <meta charset="UTF-8">
+    <title>Visualização</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    {% endblock %}
+</head>
+<body>
+    {% block corpo %}
+    <div class="col-8 m-auto pt-2 pb-2 text-center">
+        <h1><inS>Visualização</inS></h1>
+    </div>
+
+    {{nome}}
+    
+    <div class="col-8 m-auto pt-2 pb-2 text-center">
+        <a href="/" class="btn btn-info">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-90deg-left" viewBox="0 0 16 16">
+                <path fill-rule="evenodd" d="M1.146 4.854a.5.5 0 0 1 0-.708l4-4a.5.5 0 1 1 .708.708L2.707 4H12.5A2.5 2.5 0 0 1 15 6.5v8a.5.5 0 0 1-1 0v-8A1.5 1.5 0 0 0 12.5 5H2.707l3.147 3.146a.5.5 0 1 1-.708.708l-4-4z"/>
+            </svg>
+        Voltar
+        </a>
+    </div>
+
+    <div class="col-8 m-auto pt-4 pb-2 text-center">
+        <strong>Nome: </strong>{{db.nome}}<br>
+        <strong>Idade: </strong>{{db.idade}}<br>
+        <strong>Sexo: </strong>{{db.sexo}}<br>
+        <strong>IMC: </strong>{{db.imc}}<br>
+        <strong>Altura: </strong>{{db.altura}}<br>
+        <strong>CA (Circunferência Abdominal): </strong>{{db.ca}}<br>
+        <strong>RCQ (Relação Cintura-Quadril): </strong>{{db.rcq}}<br>
+        <strong>%GC (Percentual Gordura Corporal): </strong>{{db.gc}}<br>
+        <strong>CX (Tipo de Cirurgia): </strong>{{db.cx}}<br>
+        <strong>Data da Cirurgia: </strong>{{db.data}}<br>
+        <strong>Alta: </strong>{{db.alta}}<br>
+        <strong>RCQ (Relação Cintura-Quadril): </strong>{{db.rcq}}<br>
+        <strong>TPO (Tempo pós-operatório): </strong>{{db.tpo}}<br>
+        <strong>Mês 1: </strong>{{db.mes1}}<br>
+        <strong>Mês 3: </strong>{{db.mes3}}<br>
+        <strong>Mês 6: </strong>{{db.mes6}}<br>
+        <strong>Mês 9: </strong>{{db.mes9}}<br>
+        <strong>Ano 1: </strong>{{db.ano1}}<br>
+        <strong>Ano 2: </strong>{{db.ano2}}<br>
+        <strong>Ano 3: </strong>{{db.ano3}}<br>
+        <strong>Ano 4: </strong>{{db.ano4}}<br>
+        <strong>Ano 5: </strong>{{db.ano5}}<br>
+        <a href="/PrevPred/{{db.id}}/" class="btn btn-dark">
+            Previsão e Predição
+        </a>
+    </div>
+    {% endblock %}
+</body>
+</html>
