@@ -313,7 +313,7 @@ def getNumConsulta(data1, data2):
     elif numConsuta == 48: return 8
     else: return 9
 
-"""
+
 def dataFrame():
     d = {'pacienteId': Pacientes.objects.values_list("id", flat=True)}
     df = pd.DataFrame(data=d)
@@ -432,7 +432,7 @@ def ClassificadorLOO():
     rf.fit(X, y)
     # ,acc, pre, f1, auc
     return rf
-"""
+
 """
 def ClassificadorKF():
     global df
@@ -528,7 +528,7 @@ def plot_roc_curve(fper, tper):
     plt.legend()
     plt.savefig("ROC.png")
 """
-"""
+
 def Regressor():
     global df
     X = np.stack(df["consultasMenosultima"], axis=0)
@@ -620,7 +620,7 @@ def PrevPred(request, pk):
     data['db'] = {}
     data['db'] = ({'prob': round(prob[0][1], 2)*100, 'pdp4': round(100 * (pdp/pac.getExcesso()), 2), 'id': pk})
     return render(request, 'prevPred.html', data)
-"""
+
 """
 def Prediçao(request, pk):
     global rf, acc, pre, f1, auc
