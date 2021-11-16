@@ -35,5 +35,6 @@ urlpatterns = [
     path('login/', loginPage, name='login'),
     path('register/', registerPage, name='register'),
     path('inicio/', initial, name='initial'),
-] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+]  + static(settings.STATIC_URL,document_root=settings.STATICFILES_DIRS[0])
+
 
