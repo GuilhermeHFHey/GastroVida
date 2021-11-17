@@ -9,26 +9,28 @@
   }
   
   /* Style the links inside the navigation bar */
-  .topnav a svg path {
+  .topnav a {
     float: left;
     display: block;
     color: #f2f2f2;
-    fill: #f2f2f2;
     text-align: center;
     padding: 14px 16px;
     text-decoration: none;
     font-size: 17px;
   }
 
-  /* Change the color of links on hover */
-  .topnav a svg path {
-    background-color: #ddd;
-    color: black;
-    fill: black;
+  .topnav a svg {
+    color: #f2f2f2;
+    fill: #f2f2f2;
   }
 
   /* Change the color of links on hover */
-  .topnav a:hover svg:hover path:hover {
+  .topnav a:hover {
+    background-color: #ddd;
+    color: black;
+  }
+
+  .topnav a:hover svg {
     background-color: #ddd;
     color: black;
     fill: black;
