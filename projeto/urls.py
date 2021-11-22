@@ -19,26 +19,26 @@ from django.urls import path
 from django.contrib.auth import views as authViews
 from app.views import home, form, create, view, edit, update, delete, uploadExel, loginPage, registerPage, initial, PrevPred, editPac, updatePac, editCon, updateCon
 from django.conf.urls.static import static
-from django.conf import settings
+# from django.conf import settings
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', home, name='home'),
-    path('form/', form, name='form'),
-    path('create/', create, name='create'),
-    path('view/<int:pk>/', view, name='view'),
-    path('edit/<int:pk>/', edit, name='edit'),
-    path('update/<int:pk>/', update, name='update'),
-    path('delete/<int:pk>/', delete, name='delete'),
-    path('upload/', uploadExel, name='uploadExel'),
-    path('PrevPred/<int:pk>/', PrevPred, name='PrevPred'),
-    path('login/', loginPage, name='login'),
-    path('register/', registerPage, name='register'),
-    path('inicio/', initial, name='initial'),
-    path('editPac/<int:pk>/', editPac, name='initial'),
-    path('updatePac/<int:pk>/', updatePac, name='initial'),
-    path('editCon/<int:pk>/', editCon, name='initial'),
-    path('updateCon/<int:pk>/', updateCon, name='initial'),
+    # path('', home, name='home'),
+    # path('form/', form, name='form'),
+    # path('create/', create, name='create'),
+    # path('view/<int:pk>/', view, name='view'),
+    # path('edit/<int:pk>/', edit, name='edit'),
+    # path('update/<int:pk>/', update, name='update'),
+    # path('delete/<int:pk>/', delete, name='delete'),
+    # path('upload/', uploadExel, name='uploadExel'),
+    # path('PrevPred/<int:pk>/', PrevPred, name='PrevPred'),
+    # path('login/', loginPage, name='login'),
+    # path('register/', registerPage, name='register'),
+    # path('inicio/', initial, name='initial'),
+    # path('editPac/<int:pk>/', editPac, name='initial'),
+    # path('updatePac/<int:pk>/', updatePac, name='initial'),
+    # path('editCon/<int:pk>/', editCon, name='initial'),
+    # path('updateCon/<int:pk>/', updateCon, name='initial'),
 
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
