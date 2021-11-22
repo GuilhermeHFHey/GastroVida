@@ -29,7 +29,7 @@ class PacientesForm(ModelForm):
             'cx': forms.TextInput(attrs={'id':'cx','placeholder': 'Insira o Tipo da Cirurgia'}),
             'data': forms.DateInput(attrs={'id':'data','placeholder': 'Insira a Data da Cirurgia'}),
             'alta': forms.NumberInput(attrs={'id':'alta','placeholder': 'Insira a Alta'}),
-            'pesoPreOp': forms.NumberInput(attrs={'id':'pesoPreOp','placeholder': 'Insira a Alta'}),
+            'pesoPreOp': forms.NumberInput(attrs={'id':'pesoPreOp','placeholder': 'Insira o Peso Pré-Operatório'}),
         }
         labels = {
             'pesoPreOp': 'Peso pré-operatório'

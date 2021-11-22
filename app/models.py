@@ -18,7 +18,7 @@ class Pacientes(models.Model):
         ('F', 'Feminino'),
     )
     id = models.BigAutoField(primary_key=True)
-    nome = encrypt(models.CharField(max_length=150, default=''))
+    nome = models.CharField(max_length=150, default='')
     dataNasc = models.DateField(default='')
     sexo = encrypt(models.CharField(max_length=1, choices=SEXO, default=''))
     altura = encrypt(models.FloatField(max_length=30, default=''))

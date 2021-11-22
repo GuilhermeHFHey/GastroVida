@@ -30,7 +30,7 @@
     <div class="col-8 m-auto pt-4 pb-2 text-center">
         <div id="result"></div>
 
-        <form name="form" id="form" action="/create/" method="post">
+        <form name="form" id="form" action="{% if db %}/updatePac/{{ db.id }}/{% else %}/create/{% endif %}" method="post">
             {% csrf_token %}
             <div style="margin: 20px;" class="form-group row">
                 <div class="form-group col-md-4 mb-0">

@@ -79,7 +79,8 @@ def home(request):
         if search:
             pacientes = Pacientes.objects.filter(nome__icontains=search)
         else:
-            pacientes = Pacientes.objects.all()
+            pacientes = Pacientes.objects.order_by("-data")
+            # pacientes = Pacientes.objects.all()
         paginator = Paginator(pacientes, 10)
         page_number = request.GET.get('page')
         page_obj = paginator.get_page(page_number)
@@ -127,6 +128,78 @@ def create(request):
             pac.proficional.add(p)
         return JsonResponse(data={'message':'Paciente registrado'}, status=200)
 
+
+def editPac(request, pk):
+    if request.user.is_authenticated:
+        data = {}
+        data['db'] = Pacientes.objects.get(pk=pk)
+        data['form'] = PacientesForm(instance=data['db'])
+        return render(request, 'form.html', data)
+    else:
+        return redirect('login')
+
+
+def updatePac(request, pk):
+    if request.method == "POST":
+        dados = request.POST.get('dados')
+        dados = decrypt(dados, key).decode("utf-8")
+        dados = ast.literal_eval(dados)
+        nome = dados['nome']
+        dataNasc = datetime.strptime(dados['dataNasc'], '%d/%m/%Y').date() if dados['dataNasc'] != '' else datetime.now()
+        sexo = dados['sexo']
+        altura = float(dados['altura']) if dados['altura'] != '' else 0
+        cx = dados['cx']
+        pesoPreOp = float(dados['pesoPreOp']) if dados['pesoPreOp'] != '' else 0
+        data = datetime.strptime(dados['data'], '%d/%m/%Y').date() if dados['data'] != '' else datetime.now()
+        alta = float(dados['alta']) if dados['altura'] != '' else 0
+        proficional = (int(i) for i in dados['proficional'])
+        pac = Pacientes.objects.get(pk=pk)
+        pac.nome=nome
+        pac.dataNasc=dataNasc
+        pac.sexo=sexo
+        pac.altura=altura
+        pac.cx=cx
+        pac.data=data
+        pac.alta=alta
+        pac.pesoPreOp=pesoPreOp
+        pac.save()
+        for p in proficional:
+            pac.proficional.add(p)
+        return JsonResponse(data={'message':'Paciente registrado'}, status=200)
+
+
+def editCon(request, pk):
+    if request.user.is_authenticated:
+        data = {}
+        data['db'] = Consulta.objects.get(pk=pk)
+        data['form'] = ConsultaForm(instance=data['db'])
+        return render(request, 'edit.html', data)
+    else:
+        return redirect('login')
+
+
+def updateCon(request, pk):
+    if request.method == "POST":
+        dados = request.POST.get('dados')
+        dados = decrypt(dados, key).decode("utf-8")
+        dados = ast.literal_eval(dados)
+        peso = float(dados['peso']) if dados['peso'] != '' else 0
+        ca = float(dados['ca']) if dados['ca'] != '' else 0
+        rcq = float(dados['rcq']) if dados['rcq'] != '' else 0
+        gc = float(dados['gc']) if dados['gc'] != '' else 0
+        data = datetime.strptime(dados['data'], '%d/%m/%Y').date() if dados['data'] != '' else datetime.now()
+        pac = Pacientes.objects.get(pk=pk)
+        numConsulta = ((data - pac.data).days) // 30
+        con = Consulta.objects.get(pk=pk)
+        con.numConsulta=numConsulta
+        con.peso=peso
+        con.ca=ca
+        con.rcq=rcq
+        con.gc=gc
+        con.data=data
+        con.gc=gc
+        con.save()
+        return JsonResponse(data={'message':'Consulta registrada'}, status=200)
 
 def view(request, pk):
     if request.user.is_authenticated:

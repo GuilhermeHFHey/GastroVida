@@ -51,6 +51,11 @@
         <script src="{% static 'javascript.js' %}"></script>
         </tbody>
 </table>
+<div class="col-8 m-auto pt-4 pb-2 text-center">
+    <a href="/editPac/{{db.id}}/" class="btn btn-dark">
+        Editar Paciente
+    </a>
+</div>
 {% if con %}
 <div class="col-8 m-auto pt-2 pb-2 text-center">
     <h1><inS>Consultas</inS></h1>
@@ -101,6 +106,16 @@
     <script src="{% static 'javascript.js' %}"></script>
     </tbody>
 </table>
+<div class="col-8 m-auto pt-4 pb-2 text-center">
+    <a href="/editCon/{{c.id}}/" class="btn btn-dark">
+        Editar Consulta
+    </a>
+</div>
 <hr />
 {% endfor %}
+<div class="col-8 m-auto pt-4 pb-2 text-center">
+    <a href="/PrevPred/{{db.id}}/" class="btn btn-dark">
+        Previsão e Predição
+    </a>
+</div>
 {% endif %}
