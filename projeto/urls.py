@@ -17,7 +17,7 @@ from os import name
 from django.contrib import admin
 from django.urls import path
 from django.contrib.auth import views as authViews
-from app.views import home, form, create, view, edit, update, delete, uploadExel, loginPage, registerPage, initial, editPac, updatePac, editCon, updateCon
+from app.views import PrevPred, editCir, updateCir, cirurgiaForm, createCirurgia, home, form, create, view, edit, update, delete, uploadExel, loginPage, registerPage, initial, editPac, updatePac, editCon, updateCon
 from django.conf.urls.static import static
 from django.conf import settings
 
@@ -31,7 +31,7 @@ urlpatterns = [
     path('update/<int:pk>/', update, name='update'),
     path('delete/<int:pk>/', delete, name='delete'),
     path('upload/', uploadExel, name='uploadExel'),
-    # path('PrevPred/<int:pk>/', PrevPred, name='PrevPred'),
+    path('PrevPred/<int:pk>/', PrevPred, name='PrevPred'),
     path('login/', loginPage, name='login'),
     path('register/', registerPage, name='register'),
     path('inicio/', initial, name='initial'),
@@ -39,7 +39,10 @@ urlpatterns = [
     path('updatePac/<int:pk>/', updatePac, name='initial'),
     path('editCon/<int:pk>/', editCon, name='initial'),
     path('updateCon/<int:pk>/', updateCon, name='initial'),
-
+    path('cirurgia/<int:pk>/', cirurgiaForm, name='initial'),
+    path('criarCirurgia/<int:pk>/', createCirurgia, name='initial'),
+    path('editCir/<int:pk>/', editCir, name='initial'),
+    path('updateCir/<int:pk>/', updateCir, name='initial'),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 

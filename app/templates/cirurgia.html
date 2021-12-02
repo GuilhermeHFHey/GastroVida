@@ -17,11 +17,11 @@
     {% block corpo %}
 
     <div class="col-8 m-auto pt-2 pb-2 text-center">
-        <h1><inS>Cadastro</inS></h1>
+        <h1><inS>Registrar Cirurgia</inS></h1>
     </div>
     {% if db %}
     <div class="col-8 m-auto pt-2 pb-2 text-center">
-        <a href="/view/{{ db.id }}/" class="btn btn-info">
+        <a href="/" class="btn btn-info">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-90deg-left" viewBox="0 0 16 16">
                 <path fill-rule="evenodd" d="M1.146 4.854a.5.5 0 0 1 0-.708l4-4a.5.5 0 1 1 .708.708L2.707 4H12.5A2.5 2.5 0 0 1 15 6.5v8a.5.5 0 0 1-1 0v-8A1.5 1.5 0 0 0 12.5 5H2.707l3.147 3.146a.5.5 0 1 1-.708.708l-4-4z"/>
             </svg>
@@ -31,8 +31,7 @@
     {% endif %}
     {% load crispy_forms_tags %}
     <div class="col-8 m-auto pt-4 pb-2 text-center">
-
-        <form name="form" id="form" action="{% if db %}/updatePac/{{ db.id }}/{% else %}/create/{% endif %}" method="post">
+        <form name="form" id="form" action="{% if con %}/updateCir/{{con.id}}/{% else %}/criarCirurgia/{{ pac.id }}/{% endif %}" method="post">
             {% csrf_token %}
             <div class="card" style="width: 10vw; margin: auto;">
                 <div class="card-body">
@@ -42,39 +41,18 @@
             </div>
             <div style="margin: 20px;" class="form-group row">
                 <div class="form-group col-md-6 mb-0">
-                    {{ form.nome|as_crispy_field }}
+                    {{ form.cx|as_crispy_field }}
                 </div>
                 <div class="form-group col-md-6 mb-0">
-                    {{ form.dataNasc|as_crispy_field }}
+                    {{ form.pesoPreOp|as_crispy_field }}
                 </div>
             </div>
             <div style="margin: 20px;" class="form-group row">
                 <div class="form-group col-md-6 mb-0">
-                    {{ form.altura|as_crispy_field }}
+                    {{ form.data|as_crispy_field }}
                 </div>
                 <div class="form-group col-md-6 mb-0">
-                    {{ form.sexo|as_crispy_field }}
-                </div>
-            </div>
-            <div style="margin: 20px;" class="form-group row">
-                <div class="card form-group col-md-6 mb-0">
-                    {{ form.medico|as_crispy_field }}
-                </div>
-                <div class="card form-group col-md-6 mb-0">
-                    {{ form.nutricionista|as_crispy_field }}
-                </div>
-            </div>
-            <div style="margin: 20px;" class="form-group row">
-                <div class="card form-group col-md-6 mb-0">
-                    {{ form.cardiologista|as_crispy_field }}
-                </div>
-                <div class="card form-group col-md-6 mb-0">
-                    {{ form.psicologo|as_crispy_field }}
-                </div>
-            </div>
-            <div style="margin: 20px auto; width: 20%;" class="form-group row">
-                <div class="card form-group col-md-12 mb-0">
-                    {{ form.educadorFisico|as_crispy_field }}
+                    {{ form.alta|as_crispy_field }}
                 </div>
             </div>
             <div style="margin: 20px;">
@@ -83,8 +61,8 @@
         </form>
     </div>
     {% load static %}
-    <script>var pk = "{{ db.id }}";</script>
-    <script src="{% static 'form.js' %}"></script>
+    <script>var pk = "{{ pac.pk }}"</script>
+    <script src="{% static 'cirurgia.js' %}"></script>
     <script src="{% static 'jquery.mask.min.js' %}"></script>
     {% endblock %}
 </body>

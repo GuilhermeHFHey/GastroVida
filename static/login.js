@@ -26,19 +26,48 @@ function decrypt(ciphertextStr, key) {
     return decrypted.toString(CryptoJS.enc.Utf8);
 }
 
+function criptografarChaveSimetrica(data) {
+
+    // converte para JSON
+    var valores = JSON.stringify(data);
+    var iv = CryptoJS.lib.WordArray.random(16);
+    var encrypted = CryptoJS.AES.encrypt(valores, key, {
+        iv: iv
+    });
+    return iv.concat(encrypted.ciphertext).toString(CryptoJS.enc.Base64);
+}
+
+
+function decrypt(ciphertextStr, key) {
+    var ciphertext = CryptoJS.enc.Base64.parse(ciphertextStr);
+
+    // split IV and ciphertext
+    var iv = ciphertext.clone();
+    iv.sigBytes = 16;
+    iv.clamp();
+    ciphertext.words.splice(0, 4); // delete 4 words = 16 bytes
+    ciphertext.sigBytes -= 16;
+    
+    // decryption
+    var decrypted = CryptoJS.AES.decrypt({ciphertext: ciphertext}, key, {
+        iv: iv
+    });
+    return decrypted.toString(CryptoJS.enc.Utf8);
+}
+
 $(document).on('submit', '#post-form',function(e){
     e.preventDefault();
 
-    var usuario = encrypt($('#usuario').val(), key);
-    console.log("Usuario "+usuario);
+    var data = {"usuario":$('#usuario').val(), "senha": $('#senha').val()};
+    
 
-    var senha = encrypt($('#senha').val(), key);
+    var dataCripto = criptografarChaveSimetrica(data)
 
+    
     $.ajax({
         type:'POST',
-        data:{
-            usuario:usuario,
-            senha:senha,
+        url: $(this).attr('action'),
+        data:{dados: dataCripto,
             csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val(),
             action: 'post'
         },

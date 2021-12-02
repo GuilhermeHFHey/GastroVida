@@ -1,6 +1,8 @@
 (function(win,doc){
     'use strict';
 
+
+
     const user_input = $("#search")
     const artists_div = $('#replaceable-content')
     const endpoint = ''
@@ -35,21 +37,6 @@
         // setTimeout returns the ID of the function to be executed
         scheduled_function = setTimeout(ajax_call, delay_by_in_ms, endpoint, request_parameters)
     })
-
-
-    //verifica se o usuario quer mesmo deletar o dado
-    if(doc.querySelector('.btnDel')){
-        let btnDel = doc.querySelectorAll('.btnDel');
-        for(let i=0; i < btnDel.length; i++){
-            btnDel[i].addEventListener('click', function(event){
-                if(confirm('Deseja mesmo apagar este dado?')){
-                    return true;
-                }else{
-                    event.preventDefault();
-                }
-            })
-        }
-    }
 
 
     //Ajax do form

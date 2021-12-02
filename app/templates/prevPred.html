@@ -12,9 +12,8 @@
     {% block corpo %}
     <div class="col-8 m-auto pt-2 pb-2 text-center">
         <h1><inS>Predição e Previsão</inS></h1>
+        <h3>{{pac.nome}}</h3>
     </div>
-
-    {{nome}}
     
     <div class="col-8 m-auto pt-2 pb-2 text-center">
         <a href="/view/{{db.id}}" class="btn btn-info">
@@ -31,7 +30,8 @@
                 <strong class="h1">Probabilidade de abandono: </strong><p class="h1">{{db.prob}}%</p><br>
             </div>
             <div class="col">
-                <strong class="h1">Perda de Peso Proxima Consulta: </strong><p class="h1">{{db.pdp4}}%</p><br>
+                <strong class="h1">Perda de Peso(%): </strong>
+                <p class="h1">Proximidade do peso ideal: {{db.pdp4}}%</p><br>
             </div>
         </div>
     </div>

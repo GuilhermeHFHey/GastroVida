@@ -1,3 +1,4 @@
+
 $(document).ready(function(){
     $('#dataNasc').mask('00/00/0000');
     $('#data').mask('00/00/0000');
@@ -43,19 +44,57 @@ function criptografarChaveSimetrica(data) {
     return iv.concat(encrypted.ciphertext).toString(CryptoJS.enc.Base64);
 }
 
+toastr.options = {
+  "closeButton": true,
+  "debug": false,
+  "newestOnTop": false,
+  "progressBar": false,
+  "positionClass": "toast-top-right",
+  "preventDuplicates": false,
+  "onclick": null,
+  "showDuration": "300",
+  "hideDuration": "1000",
+  "timeOut": "5000",
+  "extendedTimeOut": "1000",
+  "showEasing": "swing",
+  "hideEasing": "linear",
+  "showMethod": "fadeIn",
+  "hideMethod": "fadeOut"
+}
+
 $(document).on('submit', '#form',function(e){
     e.preventDefault();
 
     var proficional = [];
-    $('input[name="proficional"]').each(function() {
-        proficional.push(this.value);
+    $('input[name="medico"]').each(function() {
+        if ($(this).is(":checked")) {
+            proficional.push(this.value);
+        }
+    });
+    $('input[name="nutricionista"]').each(function() {
+        if ($(this).is(":checked")) {
+            proficional.push(this.value);
+        }
+    });
+    $('input[name="cardiologista"]').each(function() {
+        if ($(this).is(":checked")) {
+            proficional.push(this.value);
+        }
+    });
+    $('input[name="psicologo"]').each(function() {
+        if ($(this).is(":checked")) {
+            proficional.push(this.value);
+        }
+    });
+    $('input[name="educadorFisico"]').each(function() {
+        if ($(this).is(":checked")) {
+            proficional.push(this.value);
+        }
     });
 
     var data = {"nome":$('#nome').val(), "dataNasc": $('#dataNasc').val(), "sexo": $('#sexo').val(),
-                "altura": $('#altura').val(), "cx": $('#cx').val(), "pesoPreOp":$('#pesoPreOp').val(),
-                 "data": $('#data').val(),"alta": $('#alta').val(), "proficional": proficional};
+                "altura": $('#altura').val(), "proficional": proficional};
     
-
     var dataCripto = criptografarChaveSimetrica(data)
 
     $.ajax({
@@ -66,12 +105,18 @@ $(document).on('submit', '#form',function(e){
             action: 'post'
         },
         success: function (response) {
-            $("#form").trigger('reset');
-            alert("Paciente criado");
+            toastr["success"]("Paciente Criado", "Sucesso",
+             { onHidden: function() {
+                if ($(this).attr('action') == "/updatePac/" + pk + "/"){
+                    window.location = window.location.protocol + "//" + window.location.host + "/view/" + pk + "/";
+                }else{
+                    window.location = window.location.protocol + "//" + window.location.host;
+                }
+            }})
         },
         error: function (response) {
+            toastr["error"]("Algo Falhou", "Falha")
             $("#form").trigger('reset');
-            alert("Algo falhou");
         }
     });
 });

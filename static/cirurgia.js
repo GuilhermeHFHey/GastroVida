@@ -1,3 +1,4 @@
+
 $(document).ready(function(){
     $('#data').mask('00/00/0000');
     $("#form").trigger('reset');
@@ -43,28 +44,29 @@ function criptografarChaveSimetrica(data) {
 }
 
 toastr.options = {
-    "closeButton": true,
-    "debug": false,
-    "newestOnTop": false,
-    "progressBar": false,
-    "positionClass": "toast-top-right",
-    "preventDuplicates": false,
-    "onclick": null,
-    "showDuration": "300",
-    "hideDuration": "1000",
-    "timeOut": "5000",
-    "extendedTimeOut": "1000",
-    "showEasing": "swing",
-    "hideEasing": "linear",
-    "showMethod": "fadeIn",
-    "hideMethod": "fadeOut"
-  }
+  "closeButton": true,
+  "debug": false,
+  "newestOnTop": false,
+  "progressBar": false,
+  "positionClass": "toast-top-right",
+  "preventDuplicates": false,
+  "onclick": null,
+  "showDuration": "300",
+  "hideDuration": "1000",
+  "timeOut": "5000",
+  "extendedTimeOut": "1000",
+  "showEasing": "swing",
+  "hideEasing": "linear",
+  "showMethod": "fadeIn",
+  "hideMethod": "fadeOut"
+}
 
 $(document).on('submit', '#form',function(e){
     e.preventDefault();
 
-    var data = {"peso":$('#peso').val(), "data": $('#data').val(), "ca": $('#ca').val(), "rcq": $('#rcq').val(), "gc": $('#gc').val()};
-        
+
+    var data = {"cx": $('#cx').val(), "data": $('#data').val(),"alta": $('#alta').val(), 'pesoPreOp': $('#pesoPreOp').val()};
+    
 
     var dataCripto = criptografarChaveSimetrica(data)
 
@@ -76,14 +78,14 @@ $(document).on('submit', '#form',function(e){
             action: 'post'
         },
         success: function (response) {
-            toastr["success"]("Consulta Registrada", "Sucesso",
+            toastr["success"]("Cirurgia Registrada", "Sucesso",
             { onHidden: function() {
                window.location = window.location.protocol + "//" + window.location.host + "/view/" + pk + "/";
            }})
         },
         error: function (response) {
-            $("#form").trigger('reset');
             toastr["error"]("Algo Falhou", "Falha")
+            $("#form").trigger('reset');
         }
     });
 });

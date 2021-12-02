@@ -1,5 +1,42 @@
-<form method='POST'> 
-    {% csrf_token %}
-    {{ form }}
-    <button type='submit' class='btn btn-default'>Enviar</button>
-</form>
+{% extends 'modelo.html' %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% block head%}
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registrar</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.0.0/crypto-js.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+    <link rel="stylesheet" href="{% static 'css\bootstrap.min.css' %}">
+    {% endblock %}
+</head>
+<body>
+    {% block corpo %}
+    {% load crispy_forms_tags %}
+    <div class="col-8 m-auto pt-2 pb-2 text-center">
+        <h1><inS>Registrar Profissional</inS></h1>
+    </div>
+    <div class="col-8 m-auto pt-4 pb-2 text-center">
+        <form name="form" id="form" method="post">
+            {% csrf_token %}
+            <div class="card" style="width: 10vw; margin: auto;">
+                <div class="card-body">
+                    <h5 class="card-title">Legenda:</h5>
+                    <p style="color: red;" class="card-text">Obrigatório *</p>
+                </div>
+            </div>
+            {{ form|crispy }}
+            <div style="margin: 20px;">
+                <input type="submit" class="btn btn-success" value="Salvar" id="botao">
+            </div>
+        </form>
+    </div>
+    <script src="{% static 'register.js' %}"></script>
+    {% endblock %}
+</body>
+</html>
