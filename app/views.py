@@ -677,7 +677,6 @@ print("Regressor Pronto")
 # f1 = round(acc, 2)*100
 # auc = round(acc, 2)*100
 
-
 def PrevPred(request, pk):
     global rf, lr
     pac = Pacientes.objects.get(pk=pk)

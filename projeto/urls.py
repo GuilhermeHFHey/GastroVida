@@ -44,5 +44,3 @@ urlpatterns = [
     path('editCir/<int:pk>/', editCir, name='initial'),
     path('updateCir/<int:pk>/', updateCir, name='initial'),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
-
-
