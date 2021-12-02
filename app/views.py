@@ -472,7 +472,7 @@ def getNumConsulta(data1, data2):
         else: return 4
     else: return int(numConsuta / 365) + 4
 
-
+"""
 def dataFrame():
     d = {'pacienteId': Pacientes.objects.values_list("id", flat=True)}
     df = pd.DataFrame(data=d)
@@ -730,7 +730,7 @@ def PrevPred(request, pk):
     data['pac'] = pac
     data['db'] = ({'prob': round(prob[0][1])*100, 'pdp4': round(perdaPerc[-1], 2), 'id': pk})
     return render(request, 'prevPred.html', data)
-
+"""
 BLOCK_SIZE = 16
 key = b"1234567890123456"
 
